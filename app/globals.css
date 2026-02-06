@@ -1,21 +1,51 @@
 @import "tailwindcss";
 
+@theme {
+  --color-primary: oklch(0.7389 0.2025 150.2101);
+  --color-secondary: oklch(0.9680 0.2110 109.7633);
+
+  /* Nuances VERT (Primary) - Basé sur #00C059 */
+  --color-primary-50: oklch(0.9569 0.0359 149.0656);
+  --color-primary-100: oklch(0.9125 0.0709 149.2241);
+  --color-primary-200: oklch(0.8697 0.1053 149.5543);
+  --color-primary-300: oklch(0.8260 0.1380 149.6689);
+  --color-primary-400: oklch(0.7830 0.1718 149.7029);
+  --color-primary-500: oklch(0.7389 0.2025 150.2101);
+  --color-primary-600: oklch(0.6390 0.1694 150.1004);
+  --color-primary-700: oklch(0.5379 0.1352 150.1667);
+  --color-primary-800: oklch(0.4377 0.1018 150.0416);
+  --color-primary-900: oklch(0.3377 0.0680 150.2741);
+  --color-primary-950: oklch(0.2365 0.0339 150.6229);
+
+
+  /* Nuances JAUNE (Secondary) - Basé sur #FFE147 */
+  --color-secondary-50: oklch(0.9899 0.0517 107.2838);
+  --color-secondary-100: oklch(0.9817 0.1013 108.1162);
+  --color-secondary-200: oklch(0.9754 0.1465 108.8259);
+  --color-secondary-300: oklch(0.9707 0.1851 109.3968);
+  --color-secondary-400: oklch(0.9680 0.2110 109.7633);
+  --color-secondary-500: oklch(0.8305 0.1777 109.7101);
+  --color-secondary-600: oklch(0.7137 0.1485 108.7486);
+  --color-secondary-700: oklch(0.5988 0.1209 108.9810);
+  --color-secondary-800: oklch(0.4835 0.0921 107.8193);
+  --color-secondary-900: oklch(0.3672 0.0620 106.5776);
+  --color-secondary-950: oklch(0.2526 0.0338 103.4729);
+}
+
+@source "../node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}";
+
+/* 2. Importer le plugin HeroUI (nécessite un petit fichier JS/TS) */
+@plugin "./hero-plugin.tsx";
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #ffffff;
+    --foreground: #171717;
   }
 }
 
@@ -23,4 +53,6 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  height: 100%;
+  margin: 0;
 }
