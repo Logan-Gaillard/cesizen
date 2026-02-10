@@ -2,6 +2,7 @@
 
 import { logoutUser } from "@/actions/user";
 import { useAuth } from "@/context/AuthContext";
+import { Logout, Person } from "@mui/icons-material";
 
 import {
 	Dropdown,
@@ -37,10 +38,16 @@ const UserDropdown = () => {
 				/>
 			</DropdownTrigger>
 			<DropdownMenu aria-label="User Actions" variant="flat">
-				<DropdownItem key="profile" color="primary">
+				<DropdownItem key="profile" color="primary" startContent={<Person />}>
 					Profile
 				</DropdownItem>
-				<DropdownItem key="logout" color="danger" onPress={handleLogout}>
+				<DropdownItem
+					key="logout"
+					color="danger"
+					className="text-danger"
+					onPress={handleLogout}
+					startContent={<Logout />}
+				>
 					Se déconnecter
 				</DropdownItem>
 			</DropdownMenu>

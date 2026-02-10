@@ -1,10 +1,12 @@
+"use client";
+
 import React from "react";
 import styled from "styled-components";
 
 interface IFlexProps {
 	children: React.ReactNode;
-	directionColumn?: boolean;
-	gap?: string;
+	direction?: "row" | "column";
+	gap?: string | boolean;
 	justifyContent?:
 		| "flex-start"
 		| "center"
@@ -25,20 +27,37 @@ interface IFlexProps {
 	flexGrow?: number;
 	flexShrink?: number;
 	flexBasis?: string;
+	fullWidth?: boolean;
 }
 
-const Flex = styled.div<IFlexProps>`
-    display: flex;
-    flex-direction: ${(props) => (props.directionColumn ? "column" : "row")};
-    gap: ${(props) => props.gap};
-    justify-content: ${(props) => props.justifyContent};
-    align-items: ${(props) => props.alignItems};
-    flex-wrap: ${(props) => props.flexWrap || "nowrap"};
-    align-content: ${(props) => props.alignContent};
-    flex: ${(props) => props.flex};
-    flex-grow: ${(props) => props.flexGrow};
-    flex-shrink: ${(props) => props.flexShrink};
-    flex-basis: ${(props) => props.flexBasis};
+const Flex = styled.div.withConfig({
+	shouldForwardProp: (prop) =>
+		![
+			"direction",
+			"gap",
+			"justifyContent",
+			"alignItems",
+			"flexWrap",
+			"alignContent",
+			"flex",
+			"flexGrow",
+			"flexShrink",
+			"flexBasis",
+			"fullWidth",
+		].includes(prop),
+})<IFlexProps>`
+	display: flex;
+	flex-direction: ${(props) => props.direction || "row"};
+	gap: ${(props) => (props.gap === true ? "1rem" : props.gap)};
+	justify-content: ${(props) => props.justifyContent};
+	align-items: ${(props) => props.alignItems};
+	flex-wrap: ${(props) => props.flexWrap || "nowrap"};
+	align-content: ${(props) => props.alignContent};
+	flex: ${(props) => props.flex};
+	flex-grow: ${(props) => props.flexGrow};
+	flex-shrink: ${(props) => props.flexShrink};
+	flex-basis: ${(props) => props.flexBasis};
+	width: ${(props) => (props.fullWidth ? "100%" : "auto")};
 `;
 
 export default Flex;

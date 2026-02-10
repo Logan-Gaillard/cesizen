@@ -32,6 +32,14 @@ const Logo = styled.span`
         transform: scale(1.05);
         text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
     }
+
+    &:hover .green {
+        color: var(--color-primary-200);
+    }
+
+    &:hover .yellow {
+        color: var(--color-secondary-200);
+    }
 `;
 
 const NavLinks = styled.div`
@@ -75,7 +83,10 @@ const NavBar = () => {
 
 	return (
 		<NavContainer>
-			<Logo>CESIZEN</Logo>
+			<Logo onClick={() => router.push("/")}>
+				<span className="green">CESI</span>
+				<span className="yellow">ZEN</span>
+			</Logo>
 
 			<NavLinks>
 				<NavButton variant="light" onPress={() => router.push("/")}>
