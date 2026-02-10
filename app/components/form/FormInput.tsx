@@ -4,12 +4,13 @@ import { Input } from "@heroui/react";
 import { Control, Controller, useFormContext } from "react-hook-form";
 
 interface IInputProps {
-	rules: "email" | "password";
+	type: "email" | "password" | "text";
 	name: string;
 	defaultValue?: string;
 	disabled?: boolean;
 	placeholder?: string;
 	label?: string;
+	required?: boolean;
 }
 
 const mailRules = {
@@ -27,39 +28,68 @@ const passwordRules = {
 		message: "Le mot de passe doit contenir au moins 8 caractères",
 	},
 	pattern: {
-		value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])/,
+		value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$/\\%^&*])/,
 		message:
 			"Le mot de passe doit contenir au moins une majuscule, une minuscule, un chiffre et un caractère spécial",
 	},
 };
 
+const getRules = (type: string, required?: boolean) => {
+	switch (type) {
+		case "email":
+			return required ? mailRules : { ...mailRules, required: false };
+		case "password":
+			return required ? passwordRules : { ...passwordRules, required: false };
+		default:
+			return required ? { required: "Ce champ est requis" } : {};
+	}
+};
+
 const FormInput = ({
-	rules,
+	type,
 	name,
 	defaultValue,
 	disabled,
 	placeholder,
 	label,
+	required = true,
 }: IInputProps) => {
 	const { control } = useFormContext();
+
+	// Mappe les noms de champs aux valeurs autoComplete reconnues par les navigateurs
+	const getAutoCompleteValue = (
+		fieldName: string,
+		fieldType: string,
+	): string => {
+		if (fieldType === "email") return "email";
+		if (fieldType === "password") return "current-password";
+		if (fieldName === "nickname") return "username";
+		return "off";
+	};
+
 	return (
 		<Controller
 			control={control}
-			rules={rules === "email" ? mailRules : passwordRules}
-			render={({ field: { onChange, onBlur, value } }) => (
+			rules={getRules(type, required)}
+			render={({ field: { onChange, onBlur, value }, fieldState }) => (
 				<Input
 					label={label}
 					placeholder={placeholder}
 					onBlur={onBlur}
 					onValueChange={onChange}
 					value={value}
+					type={type}
+					errorMessage={fieldState.error?.message}
+					isInvalid={!!fieldState.error}
+					required={required}
 					variant="bordered"
+					autoComplete={getAutoCompleteValue(name, type)}
 				/>
 			)}
 			name={name}
 			defaultValue={defaultValue}
 			disabled={disabled}
-		></Controller>
+		/>
 	);
 };
 

@@ -1,8 +1,10 @@
-'use client';
+"use client";
 
+import { useAuth } from "@/context/AuthContext";
 import { Button } from "@heroui/react";
 import { useRouter } from "next/navigation";
 import styled from "styled-components";
+import UserDropdown from "./NavBar/UserDropdown";
 
 const NavContainer = styled.nav`
     width: 100%;
@@ -68,25 +70,41 @@ const LoginButton = styled(Button)`
 `;
 
 const NavBar = () => {
-    const router = useRouter();
+	const router = useRouter();
+	const user = useAuth();
 
-    return (
-        <NavContainer>
-            <Logo>CESIZEN</Logo>
+	return (
+		<NavContainer>
+			<Logo>CESIZEN</Logo>
 
-            <NavLinks>
-                <NavButton variant="light" onPress={()=> router.push('/') }>
-                    Accueil
-                </NavButton>
-                <NavButton variant="light" onPress={()=> router.push('/exercices') }>
-                    Exercices
-                </NavButton>
-                <LoginButton variant="flat" onPress={()=> router.push('/login') }>
-                    Se connecter
-                </LoginButton>
-            </NavLinks>
-        </NavContainer>
-    );
-}
+			<NavLinks>
+				<NavButton variant="light" onPress={() => router.push("/")}>
+					Accueil
+				</NavButton>
+				<NavButton variant="light" onPress={() => router.push("/exercices")}>
+					Exercices
+				</NavButton>
+
+				{user.data && (
+					<>
+						<NavButton
+							variant="light"
+							onPress={() => router.push("/dashboard")}
+						>
+							Dashboard
+						</NavButton>
+						<UserDropdown />
+					</>
+				)}
+
+				{!user.data && (
+					<LoginButton variant="flat" onPress={() => router.push("/login")}>
+						Se connecter
+					</LoginButton>
+				)}
+			</NavLinks>
+		</NavContainer>
+	);
+};
 
 export default NavBar;
