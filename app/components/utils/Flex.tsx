@@ -7,6 +7,7 @@ interface IFlexProps {
 	children: React.ReactNode;
 	direction?: "row" | "column";
 	gap?: string | boolean;
+	padding?: string;
 	justifyContent?:
 		| "flex-start"
 		| "center"
@@ -51,6 +52,7 @@ const Flex = styled.div.withConfig({
 	display: flex;
 	flex-direction: ${(props) => props.direction || "row"};
 	gap: ${(props) => (props.gap === true ? "1rem" : props.gap)};
+	padding: ${(props) => props.padding};
 	justify-content: ${(props) => props.justifyContent};
 	align-items: ${(props) => props.alignItems};
 	flex-wrap: ${(props) => props.flexWrap || "nowrap"};

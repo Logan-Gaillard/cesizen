@@ -4,7 +4,7 @@ import { Button } from "@heroui/react";
 import InfoCard from "./components/Infos/InfoCard";
 import Flex from "./components/utils/Flex";
 import Title from "./components/utils/Title";
-import { ArrowLeft, ArrowRight } from "@mui/icons-material";
+import { ArrowRight } from "@mui/icons-material";
 
 export default function Home() {
 	const infos = [

@@ -1,14 +1,6 @@
 "use client";
 
-import React from "react";
-import {
-	Card,
-	CardHeader,
-	CardBody,
-	CardFooter,
-	Image,
-	Button,
-} from "@heroui/react";
+import { Card, CardHeader, CardBody, Image } from "@heroui/react";
 import { CalendarToday } from "@mui/icons-material";
 import Flex from "../utils/Flex";
 import useIsMobile from "@/context/useIsMobile";
