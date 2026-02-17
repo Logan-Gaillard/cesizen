@@ -12,10 +12,12 @@ import {
 	User,
 } from "@heroui/react";
 import { useRouter } from "next/navigation";
+import useIsAdmin from "@/context/useIsAdmin";
 
 const UserDropdown = () => {
 	const user = useAuth();
 	const router = useRouter();
+	const isAdmin = useIsAdmin();
 
 	const handleLogout = async () => {
 		await logoutUser();
@@ -41,6 +43,11 @@ const UserDropdown = () => {
 				<DropdownItem key="profile" color="primary" startContent={<Person />}>
 					Profile
 				</DropdownItem>
+				{isAdmin && (
+					<DropdownItem key="admin" color="primary" startContent={<Person />}>
+						Espace Administrateur
+					</DropdownItem>
+				)}
 				<DropdownItem
 					key="logout"
 					color="danger"

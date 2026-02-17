@@ -1,5 +1,6 @@
 "use client";
 
+import useIsMobile from "@/context/useIsMobile";
 import { Input } from "@heroui/react";
 import { Control, Controller, useFormContext } from "react-hook-form";
 
@@ -55,6 +56,7 @@ const FormInput = ({
 	required = true,
 }: IInputProps) => {
 	const { control } = useFormContext();
+	const isMobile = useIsMobile();
 
 	// Mappe les noms de champs aux valeurs autoComplete reconnues par les navigateurs
 	const getAutoCompleteValue = (
@@ -84,6 +86,8 @@ const FormInput = ({
 					required={required}
 					variant="bordered"
 					autoComplete={getAutoCompleteValue(name, type)}
+					size={isMobile ? "sm" : "md"}
+					classNames={{label: "text-xs"}}
 				/>
 			)}
 			name={name}

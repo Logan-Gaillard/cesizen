@@ -19,6 +19,7 @@
     "@types/styled-components": "^5.1.36",
     "argon2": "^0.44.0",
     "framer-motion": "^12.31.0",
+    "lodash": "^4.17.23",
     "next": "16.1.6",
     "pg": "^8.18.0",
     "prisma": "^7.3.0",
@@ -30,7 +31,8 @@
   "devDependencies": {
     "@biomejs/biome": "2.3.14",
     "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
+    "@types/lodash": "^4.17.23",
+    "@types/node": "^20.19.33",
     "@types/pg": "^8.16.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",

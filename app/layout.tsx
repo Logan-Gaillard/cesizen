@@ -28,7 +28,7 @@ export default async function RootLayout({
 	return (
 		<html lang="fr">
 			<body
-				className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+				className={`${geistSans.variable} ${geistMono.variable} max-h-full antialiased`}
 			>
 				<AuthProvider>
 					<NavBar />

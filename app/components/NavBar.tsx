@@ -5,6 +5,11 @@ import { Button } from "@heroui/react";
 import { useRouter } from "next/navigation";
 import styled from "styled-components";
 import UserDropdown from "./NavBar/UserDropdown";
+import useIsMobile from "../../context/useIsMobile";
+import { useState } from "react";
+import { Close, Login, Menu } from "@mui/icons-material";
+import UserAccordion from "./NavBar/UserAccordion";
+import useIsAdmin from "@/context/useIsAdmin";
 
 const NavContainer = styled.nav`
     width: 100%;
@@ -21,7 +26,7 @@ const NavContainer = styled.nav`
 `;
 
 const Logo = styled.span`
-    font-size: 24px;
+    font-size: var(--text-2xl);
     font-weight: bold;
     color: white;
     letter-spacing: 2px;
@@ -77,9 +82,46 @@ const LoginButton = styled(Button)`
     }
 `;
 
+const IconButton = styled(Button)`
+    background-color: transparent !important;
+    color: white;
+    min-width: auto !important;
+    padding: 8px !important;
+`;
+
+const MobileActions = styled.div`
+    display: flex;
+    align-items: center;
+    gap: 8px;
+`;
+
+const MobileMenu = styled.div<{ $open: boolean }>`
+    position: absolute;
+    top: 100%;
+    right: 0;
+    width: 100%;
+    background: white;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.2);
+    padding: 12px;
+    display: ${({ $open }) => ($open ? "flex" : "none")};
+    flex-direction: column;
+    gap: 8px;
+    z-index: 60;
+`;
+
+const MobileButton = styled(Button)`
+    width: 100%;
+    justify-content: flex-start !important;
+    background-color: transparent !important;
+    color: var(--color-primary-700);
+    font-weight: 600;
+`;
+
 const NavBar = () => {
 	const router = useRouter();
 	const user = useAuth();
+	const isMobile = useIsMobile();
+	const [menuOpen, setMenuOpen] = useState(false);
 
 	return (
 		<NavContainer>
@@ -88,32 +130,76 @@ const NavBar = () => {
 				<span className="yellow">ZEN</span>
 			</Logo>
 
-			<NavLinks>
-				<NavButton variant="light" onPress={() => router.push("/")}>
-					Accueil
-				</NavButton>
-				<NavButton variant="light" onPress={() => router.push("/exercices")}>
-					Exercices
-				</NavButton>
-
-				{user.data && (
-					<>
-						<NavButton
+			{isMobile ? (
+				<MobileActions>
+					<IconButton
+						isIconOnly
+						variant="light"
+						onPress={() => setMenuOpen((open) => !open)}
+					>
+						{menuOpen ? <Close /> : <Menu />}
+					</IconButton>
+					<MobileMenu $open={menuOpen}>
+						<MobileButton
 							variant="light"
-							onPress={() => router.push("/dashboard")}
+							onPress={() => {
+								setMenuOpen(false);
+								router.push("/");
+							}}
 						>
-							Dashboard
-						</NavButton>
-						<UserDropdown />
-					</>
-				)}
+							Accueil
+						</MobileButton>
+						{user.data && (
+							<MobileButton
+								variant="light"
+								onPress={() => {
+									setMenuOpen(false);
+									router.push("/exercices");
+								}}
+							>
+								Exercices
+							</MobileButton>
+						)}
+						{!user.data && (
+							<MobileButton
+								variant="light"
+								startContent={<Login />}
+								onPress={() => {
+									setMenuOpen(false);
+									router.push("/login");
+								}}
+							>
+								Se connecter
+							</MobileButton>
+						)}
 
-				{!user.data && (
-					<LoginButton variant="flat" onPress={() => router.push("/login")}>
-						Se connecter
-					</LoginButton>
-				)}
-			</NavLinks>
+						{user.data && <UserAccordion />}
+					</MobileMenu>
+				</MobileActions>
+			) : (
+				<NavLinks>
+					<NavButton variant="light" onPress={() => router.push("/")}>
+						Accueil
+					</NavButton>
+					{user.data && (
+						<>
+							<NavButton
+								variant="light"
+								onPress={() => router.push("/exercices")}
+							>
+								Exercices
+							</NavButton>
+							<UserDropdown />
+						</>
+					)}
+
+					{!user.data && (
+						<LoginButton variant="flat" onPress={() => router.push("/login")}>
+							Se connecter
+						</LoginButton>
+					)}
+				</NavLinks>
+			)}
 		</NavContainer>
 	);
 };

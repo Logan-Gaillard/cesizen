@@ -28,6 +28,7 @@ interface IFlexProps {
 	flexShrink?: number;
 	flexBasis?: string;
 	fullWidth?: boolean;
+	fullHeight?: boolean;
 }
 
 const Flex = styled.div.withConfig({
@@ -44,6 +45,7 @@ const Flex = styled.div.withConfig({
 			"flexShrink",
 			"flexBasis",
 			"fullWidth",
+			"fullHeight",
 		].includes(prop),
 })<IFlexProps>`
 	display: flex;
@@ -58,6 +60,7 @@ const Flex = styled.div.withConfig({
 	flex-shrink: ${(props) => props.flexShrink};
 	flex-basis: ${(props) => props.flexBasis};
 	width: ${(props) => (props.fullWidth ? "100%" : "auto")};
+	height: ${(props) => (props.fullHeight ? "100%" : "auto")};
 `;
 
 export default Flex;

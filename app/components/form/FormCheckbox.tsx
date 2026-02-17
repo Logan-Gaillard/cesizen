@@ -1,5 +1,6 @@
 "use client";
 
+import useIsMobile from "@/context/useIsMobile";
 import { Checkbox } from "@heroui/react";
 import { Controller, useFormContext } from "react-hook-form";
 
@@ -19,6 +20,7 @@ const FormCheckbox = ({
 	required = true,
 }: ICheckboxProps) => {
 	const { control } = useFormContext();
+	const isMobile = useIsMobile();
 	return (
 		<Controller
 			control={control}
@@ -30,6 +32,7 @@ const FormCheckbox = ({
 					value={value}
 					isInvalid={!!fieldState.error}
 					required={required}
+					size={isMobile ? "sm" : "md"}
 				>
 					{label}
 				</Checkbox>
