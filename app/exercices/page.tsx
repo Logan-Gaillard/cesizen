@@ -1,15 +1,16 @@
 "use client";
 
-import { Button, Card } from "@heroui/react";
+import { Card, Button, NumberInput } from "@heroui/react";
 import { Pause, PlayArrow, Stop } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import Flex from "../components/utils/Flex";
 import Title from "../components/utils/Title";
+import useIsMobile from "@/context/useIsMobile";
 
 type Phase = {
 	name: string;
 	duration: number;
-	mode: "in" | "out" | "hold";
+	mode: "inspiration" | "expiration" | "tenir";
 };
 
 type Exercise = {
@@ -26,8 +27,8 @@ const exercises: Exercise[] = [
 		description:
 			"Idéal pour réduire le stress. Inspirez sur 5 secondes, expirez sur 5 secondes.",
 		phases: [
-			{ name: "Inspiration", duration: 5, mode: "in" },
-			{ name: "Expiration", duration: 5, mode: "out" },
+			{ name: "Inspiration", duration: 5, mode: "inspiration" },
+			{ name: "Expiration", duration: 5, mode: "expiration" },
 		],
 	},
 	{
@@ -36,9 +37,9 @@ const exercises: Exercise[] = [
 		description:
 			"Favorise l'endormissement. Inspirez (4s), retenez (7s), expirez (8s).",
 		phases: [
-			{ name: "Inspiration", duration: 4, mode: "hold" },
-			{ name: "Rétention", duration: 7, mode: "hold" },
-			{ name: "Expiration", duration: 8, mode: "out" },
+			{ name: "Inspiration", duration: 4, mode: "inspiration" },
+			{ name: "Rétention", duration: 7, mode: "tenir" },
+			{ name: "Expiration", duration: 8, mode: "expiration" },
 		],
 	},
 	{
@@ -47,42 +48,115 @@ const exercises: Exercise[] = [
 		description:
 			"Booste la concentration. 4 temps égaux pour chaque phase du cycle.",
 		phases: [
-			{ name: "Inspiration", duration: 4, mode: "out" },
-			{ name: "Rétention (plein)", duration: 4, mode: "hold" },
-			{ name: "Expiration", duration: 4, mode: "out" },
-			{ name: "Rétention (vide)", duration: 4, mode: "hold" },
+			{ name: "Inspiration", duration: 4, mode: "inspiration" },
+			{ name: "Rétention (plein)", duration: 4, mode: "tenir" },
+			{ name: "Expiration", duration: 4, mode: "expiration" },
+			{ name: "Rétention (vide)", duration: 4, mode: "tenir" },
 		],
 	},
 ];
 
+const playBeep = (frequency = 600, duration = 150) => {
+	const audioCtx = new (window.AudioContext || window.AudioContext)();
+	const oscillator = audioCtx.createOscillator();
+
+	oscillator.type = "sine";
+	oscillator.frequency.value = frequency;
+	oscillator.connect(audioCtx.destination);
+
+	oscillator.start();
+	setTimeout(() => oscillator.stop(), duration);
+};
+
 export default function RespirationPage() {
 	const [isPlaying, setIsPlaying] = useState(false);
 	const [selectedExercise, setSelectedExercise] = useState<Exercise>();
-	const [currentPhase, setCurrentPhase] = useState<Phase>();
+	const [currentPhaseIndex, setCurrentPhaseIndex] = useState(0);
 	const [timeLeft, setTimeLeft] = useState(0);
-	const [currentCycle, setCurrentCycle] = useState(0);
-	const [cycle, setCycle] = useState(3);
+	const [maxCycleTime, setMaxCycleTime] = useState(3);
+	const [cycleCount, setCycleCount] = useState(0);
+
+	const isMobile = useIsMobile();
+
+	const currentPhase = selectedExercise?.phases[currentPhaseIndex];
 
 	const selectExercise = (exercise: Exercise) => {
 		setSelectedExercise(exercise);
-		setCurrentPhase(exercise.phases[0]);
+		setCurrentPhaseIndex(0);
 		setTimeLeft(exercise.phases[0].duration);
-		setIsPlaying(false);
+		setCycleCount(0);
 	};
 
 	const stopExercise = () => {
 		setIsPlaying(false);
-		setCurrentPhase(undefined);
-		setTimeLeft(0);
-		setCurrentCycle(0);
+		if (selectedExercise) {
+			setCurrentPhaseIndex(0);
+			setTimeLeft(selectedExercise.phases[0].duration);
+		}
+		setCycleCount(0);
 	};
 
-	const startExercise = () => {
-		setIsPlaying(true);
+	useEffect(() => {
+		if (!isPlaying || !selectedExercise) return;
+		const timer = setTimeout(() => {
+			if (timeLeft > 1) {
+				setTimeLeft((prev) => prev - 1);
+			} else {
+				const nextIndex =
+					(currentPhaseIndex + 1) % selectedExercise.phases.length;
+				if (nextIndex === 0) {
+					console.log("Cycle count:", cycleCount + 1);
+					if (cycleCount + 1 === maxCycleTime) {
+						setIsPlaying(false);
+						setCycleCount(0);
+					} else {
+						setCycleCount((prev) => prev + 1);
+						playBeep(600, 250);
+					}
+				} else {
+					playBeep();
+				}
+				setCurrentPhaseIndex(nextIndex);
+				playBeep();
+				setTimeLeft(selectedExercise.phases[nextIndex].duration);
+			}
+		}, 1000);
+		return () => clearTimeout(timer);
+	}, [
+		isPlaying,
+		timeLeft,
+		selectedExercise,
+		currentPhaseIndex,
+		cycleCount,
+		maxCycleTime,
+	]);
+
+	const getCircleAnimSize = () => {
+		if (!currentPhase) return "50%";
+		if (currentPhase.mode === "inspiration") return "100%";
+		if (currentPhase.mode === "expiration") return "0%";
+		return "60%";
 	};
 
-	const nextPhase = () => {
-		if (!selectedExercise) return;
+	const getCircleAnimTimeTrans = () => {
+		if (!currentPhase || !isPlaying) return "0ms";
+		if (currentPhase.mode === "tenir")
+			return `${(currentPhase.duration * 1000) / 3}ms`;
+		return `${currentPhase.duration * 1000}ms`;
+	};
+
+	const getCircleAnimTimingFunc = () => {
+		if (!currentPhase || !isPlaying) return "linear";
+		if (currentPhase.mode === "tenir") return "ease-out";
+		return "linear";
+	};
+
+	const getCircleAnimColor = () => {
+		if (!currentPhase) return "var(--color-primary-50)";
+		if (currentPhase.mode === "tenir") return "var(--color-secondary-500)";
+		if (currentPhase.mode === "inspiration") return "var(--color-primary-300)";
+		if (currentPhase.mode === "expiration") return "var(--color-primary-100)";
+		return "var(--color-primary-200)";
 	};
 
 	return (
@@ -93,18 +167,17 @@ export default function RespirationPage() {
 			</p>
 
 			<Flex
-				direction="row"
+				direction={isMobile ? "column" : "row"}
 				gap="24px"
 				fullWidth
 				flexWrap="wrap"
-				className="flex-1 items-stretch"
 			>
 				{/* Liste des exercices */}
 				<Card className="p-8 gap-4">
 					<Title size="sm" underline>
 						Exercices disponibles :
 					</Title>
-					<Flex direction="column" gap="16px" className="w-1/3">
+					<Flex direction="column" gap="16px">
 						{exercises.map((ex) => (
 							<Button
 								key={ex.id}
@@ -119,18 +192,38 @@ export default function RespirationPage() {
 							</Button>
 						))}
 					</Flex>
+					<Title size="sm" underline>
+						Options :
+					</Title>
+					<Flex direction="column" gap="8px">
+						<NumberInput
+							label="Nombre de cycles"
+							value={maxCycleTime}
+							onChange={(value) => setMaxCycleTime(Number(value))}
+							min={1}
+							max={100}
+						/>
+					</Flex>
 				</Card>
 
 				{/* Zone visuelle et contrôles */}
 
 				{!selectedExercise ? (
-					<Flex justifyContent="center" alignItems="center" flex="1">
+					<Flex
+						justifyContent="center"
+						alignItems="center"
+						flex="1"
+						className={`${!isMobile && "min-w-100"}`}
+					>
 						<p className="text-gray-400 text-lg">
 							Sélectionnez un exercice pour commencer.
 						</p>
 					</Flex>
 				) : (
-					<Card className="p-8 gap-4 flex-1" fullWidth>
+					<Card
+						className={`p-8 gap-4 flex-1 ${!isMobile ? "min-w-100" : ""}`}
+						fullWidth
+					>
 						<Title size="sm" underline>
 							{selectedExercise.title}
 						</Title>
@@ -142,7 +235,7 @@ export default function RespirationPage() {
 						>
 							<Flex className="top-8 left-0 right-0" justifyContent="center">
 								<p className="text-primary-600 text-2xl font-extrabold">
-									{currentPhase?.name}
+									{currentPhase?.name || ""}
 								</p>
 							</Flex>
 
@@ -153,22 +246,13 @@ export default function RespirationPage() {
 								className="relative rounded-full bg-primary-50 border-4 border-primary-200 overflow-hidden"
 							>
 								<div
-									className={`absolute rounded-full bg-primary-300 opacity-40`}
+									className={`absolute rounded-full opacity-40`}
 									style={{
-										width:
-											currentPhase?.mode === "in"
-												? "100%"
-												: currentPhase?.mode === "out"
-													? "20%"
-													: "60%",
-										height:
-											currentPhase?.mode === "in"
-												? "100%"
-												: currentPhase?.mode === "out"
-													? "0%"
-													: "60%",
-										transitionDuration: `${currentPhase ? currentPhase.duration * 1000 : 1000}ms`,
-										transitionTimingFunction: "linear",
+										backgroundColor: getCircleAnimColor(),
+										width: getCircleAnimSize(),
+										height: getCircleAnimSize(),
+										transitionDuration: `${getCircleAnimTimeTrans()}`,
+										transitionTimingFunction: `${getCircleAnimTimingFunc()}`,
 									}}
 								/>
 								<span className="text-4xl font-bold text-primary-800 z-10">
@@ -190,7 +274,7 @@ export default function RespirationPage() {
 									variant="flat"
 									color="danger"
 									className="w-16 h-16 rounded-full"
-									// onPress={stopExercise}
+									onPress={stopExercise}
 								>
 									<Stop />
 								</Button>

@@ -5,8 +5,10 @@ import InfoCard from "./components/Infos/InfoCard";
 import Flex from "./components/utils/Flex";
 import Title from "./components/utils/Title";
 import { ArrowRight } from "@mui/icons-material";
+import useIsMobile from "@/context/useIsMobile";
 
 export default function Home() {
+	const isMobile = useIsMobile();
 	const infos = [
 		{
 			id: 1,
@@ -57,7 +59,12 @@ export default function Home() {
 					</Button>
 				</Flex>
 
-				<Flex flexWrap="wrap" gap="24px" justifyContent="center" fullWidth>
+				<Flex
+					flexWrap="wrap"
+					gap="24px"
+					justifyContent={isMobile ? "center" : "flex-start"}
+					fullWidth
+				>
 					{infos.map((info) => (
 						<InfoCard key={info.id} {...info} />
 					))}

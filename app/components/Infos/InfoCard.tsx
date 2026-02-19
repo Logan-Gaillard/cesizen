@@ -49,7 +49,10 @@ const InfoCard = ({
 						year: "numeric",
 					})}
 				</Flex>
-				<h3 className="text-2xl font-bold text-primary-800 line-clamp-1">
+				<h3
+					className="text-2xl font-bold text-primary-800 line-clamp-1"
+					title={title}
+				>
 					{title}
 				</h3>
 				<p className="text-sm text-slate-600 line-clamp-3 leading-relaxed">
