@@ -160,7 +160,7 @@ export default function RespirationPage() {
 	};
 
 	return (
-		<Flex direction="column" gap>
+		<Flex direction="column" gap className="max-w-6xl mx-auto w-full">
 			<Title size="lg">Espace Respiration</Title>
 			<p className="text-gray-600 mb-4">
 				Sélectionnez un exercice et suivez le rythme pour vous détendre.
@@ -173,7 +173,7 @@ export default function RespirationPage() {
 				flexWrap="wrap"
 			>
 				{/* Liste des exercices */}
-				<Card className="p-8 gap-4">
+				<Card className="p-8 gap-4 grow">
 					<Title size="sm" underline>
 						Exercices disponibles :
 					</Title>
@@ -204,10 +204,8 @@ export default function RespirationPage() {
 							max={100}
 						/>
 					</Flex>
-				</Card>
-
+				</Card>{" "}
 				{/* Zone visuelle et contrôles */}
-
 				{!selectedExercise ? (
 					<Flex
 						justifyContent="center"

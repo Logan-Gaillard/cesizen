@@ -1,9 +1,10 @@
 "use client";
 
 import { Card, CardHeader, CardBody, Image } from "@heroui/react";
-import { CalendarToday } from "@mui/icons-material";
+import { CalendarToday, Route } from "@mui/icons-material";
 import Flex from "../utils/Flex";
 import useIsMobile from "@/context/useIsMobile";
+import Router from "next/router";
 
 interface InfoCardProps {
 	title: string;
@@ -11,6 +12,7 @@ interface InfoCardProps {
 	createdAt: string;
 	imageUrl: string;
 	isRead?: boolean;
+	onPress?: () => void;
 }
 
 const InfoCard = ({
@@ -18,6 +20,7 @@ const InfoCard = ({
 	description,
 	createdAt,
 	imageUrl,
+	onPress,
 }: InfoCardProps) => {
 	const isMobile = useIsMobile();
 	return (
@@ -26,7 +29,7 @@ const InfoCard = ({
 			isHoverable
 			shadow="md"
 			className={`w-fit p-4 cursor-pointer ${isMobile ? "w-full" : "max-w-lg"}`}
-			onPress={() => console.log("item pressed")}
+			onPress={onPress}
 		>
 			<CardHeader>
 				<Image

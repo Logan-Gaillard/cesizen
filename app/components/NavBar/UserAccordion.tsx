@@ -19,24 +19,6 @@ const ItemContent = styled.div`
 	padding: 4px 0;
 `;
 
-const ActionButton = styled.button`
-	width: 100%;
-	display: flex;
-	align-items: center;
-	gap: 10px;
-	padding: 8px 12px;
-	background: transparent;
-	border: 0;
-	color: var(--color-primary-700);
-	font-weight: 600;
-	cursor: pointer;
-	text-align: left;
-
-	&:hover {
-		background: var(--color-primary-50);
-	}
-`;
-
 const MobileButton = styled(Button)`
     width: fit-content;
     justify-content: flex-start !important;

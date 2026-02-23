@@ -149,6 +149,15 @@ const NavBar = () => {
 						>
 							Accueil
 						</MobileButton>
+						<MobileButton
+							variant="light"
+							onPress={() => {
+								setMenuOpen(false);
+								router.push("/actus");
+							}}
+						>
+							Actualités
+						</MobileButton>
 						{user.data && (
 							<MobileButton
 								variant="light"
@@ -180,6 +189,9 @@ const NavBar = () => {
 				<NavLinks>
 					<NavButton variant="light" onPress={() => router.push("/")}>
 						Accueil
+					</NavButton>
+					<NavButton variant="light" onPress={() => router.push("/actus")}>
+						Actualités
 					</NavButton>
 					{user.data && (
 						<>

@@ -30,6 +30,7 @@ interface IFlexProps {
 	flexBasis?: string;
 	fullWidth?: boolean;
 	fullHeight?: boolean;
+	grow?: boolean;
 }
 
 const Flex = styled.div.withConfig({
@@ -47,22 +48,24 @@ const Flex = styled.div.withConfig({
 			"flexBasis",
 			"fullWidth",
 			"fullHeight",
+			"grow",
 		].includes(prop),
 })<IFlexProps>`
 	display: flex;
-	flex-direction: ${(props) => props.direction || "row"};
-	gap: ${(props) => (props.gap === true ? "1rem" : props.gap)};
-	padding: ${(props) => props.padding};
-	justify-content: ${(props) => props.justifyContent};
-	align-items: ${(props) => props.alignItems};
-	flex-wrap: ${(props) => props.flexWrap || "nowrap"};
-	align-content: ${(props) => props.alignContent};
-	flex: ${(props) => props.flex};
-	flex-grow: ${(props) => props.flexGrow};
-	flex-shrink: ${(props) => props.flexShrink};
-	flex-basis: ${(props) => props.flexBasis};
-	width: ${(props) => (props.fullWidth ? "100%" : "auto")};
-	height: ${(props) => (props.fullHeight ? "100%" : "auto")};
+	${(props) => props.direction && `flex-direction: ${props.direction};`}
+	${(props) => props.gap && `gap: ${props.gap === true ? "1rem" : props.gap};`}
+	${(props) => props.padding && `padding: ${props.padding};`}
+	${(props) => props.justifyContent && `justify-content: ${props.justifyContent};`}
+	${(props) => props.alignItems && `align-items: ${props.alignItems};`}
+	${(props) => props.flexWrap && `flex-wrap: ${props.flexWrap};`}
+	${(props) => props.alignContent && `align-content: ${props.alignContent};`}
+	${(props) => props.flex && `flex: ${props.flex};`}
+	${(props) => props.flexGrow !== undefined && `flex-grow: ${props.flexGrow};`}
+	${(props) => props.flexShrink !== undefined && `flex-shrink: ${props.flexShrink};`}
+	${(props) => props.flexBasis && `flex-basis: ${props.flexBasis};`}
+	${(props) => props.fullWidth && `width: 100%;`}
+	${(props) => props.fullHeight && `height: 100%;`}
+	${(props) => props.grow && `flex-grow: 1;`}
 `;
 
 export default Flex;
