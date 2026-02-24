@@ -3,9 +3,10 @@
 import { FormProvider, useForm } from "react-hook-form";
 import FormInput from "../components/form/FormInput";
 import FormCard from "../components/form/FormCard";
-import styled from "styled-components";
 import { Button } from "@heroui/react";
 import { registerUser } from "../../actions/user";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 type FormData = {
 	nickname: string;
@@ -24,11 +25,21 @@ const Register = () => {
 		},
 	});
 
+	const router = useRouter();
 	const { handleSubmit } = methods;
+	const [error, setError] = useState<{ message: string }>();
 
 	const onSubmit = handleSubmit(async (data) => {
 		console.log(data);
 		const result = await registerUser(data);
+		if (result.success) {
+			router.push("/login");
+		} else {
+			setError({
+				message:
+					result.message || "Une erreur est survenue lors de la connexion.",
+			});
+		}
 		console.log(result);
 	});
 
@@ -68,6 +79,12 @@ const Register = () => {
 							placeholder="••••••••"
 						/>
 					</div>
+
+					{error && (
+						<div className="mb-4 w-full rounded bg-red-100 p-3 text-sm text-red-700">
+							{error.message}
+						</div>
+					)}
 
 					<Button
 						type="submit"

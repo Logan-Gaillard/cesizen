@@ -26,7 +26,11 @@ const MobileButton = styled(Button)`
     font-weight: 600;
 `;
 
-const UserAccordion = () => {
+const UserAccordion = ({
+	setIsDropdownOpen,
+}: {
+	setIsDropdownOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}) => {
 	const isAdmin = useIsAdmin();
 	const user = useAuth();
 	const router = useRouter();
@@ -34,6 +38,7 @@ const UserAccordion = () => {
 	const handleLogout = async () => {
 		await logoutUser();
 		await user.refreshAuth();
+		setIsDropdownOpen(false);
 		router.push("/");
 	};
 
@@ -51,6 +56,10 @@ const UserAccordion = () => {
 						variant="light"
 						className={"text-primary-700"}
 						type="button"
+						onPress={() => {
+							setIsDropdownOpen(false);
+							router.push("/profile");
+						}}
 					>
 						<Person fontSize="small" />
 						Profile
@@ -60,6 +69,10 @@ const UserAccordion = () => {
 							variant="light"
 							className={"text-primary-700"}
 							type="button"
+							onPress={() => {
+								setIsDropdownOpen(false);
+								router.push("/admin");
+							}}
 						>
 							<Person fontSize="small" />
 							Espace administrateur

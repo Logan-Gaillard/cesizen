@@ -5,11 +5,9 @@ import InfoCard from "./components/Infos/InfoCard";
 import Flex from "./components/utils/Flex";
 import Title from "./components/utils/Title";
 import { ArrowRight } from "@mui/icons-material";
-import useIsMobile from "@/context/useIsMobile";
 import { useRouter } from "next/navigation";
 
 export default function Home() {
-	const isMobile = useIsMobile();
 	const router = useRouter();
 	const infos = [
 		{

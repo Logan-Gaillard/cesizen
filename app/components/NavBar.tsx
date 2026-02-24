@@ -3,7 +3,7 @@
 import { useAuth } from "@/context/AuthContext";
 import { Button } from "@heroui/react";
 import { useRouter } from "next/navigation";
-import styled from "styled-components";
+import styled, { StyleSheetManager } from "styled-components";
 import UserDropdown from "./NavBar/UserDropdown";
 import useIsMobile from "../../context/useIsMobile";
 import { useState } from "react";
@@ -124,95 +124,97 @@ const NavBar = () => {
 	const [menuOpen, setMenuOpen] = useState(false);
 
 	return (
-		<NavContainer>
-			<Logo onClick={() => router.push("/")}>
-				<span className="green">CESI</span>
-				<span className="yellow">ZEN</span>
-			</Logo>
+		<StyleSheetManager>
+			<NavContainer>
+				<Logo onClick={() => router.push("/")}>
+					<span className="green">CESI</span>
+					<span className="yellow">ZEN</span>
+				</Logo>
 
-			{isMobile ? (
-				<MobileActions>
-					<IconButton
-						isIconOnly
-						variant="light"
-						onPress={() => setMenuOpen((open) => !open)}
-					>
-						{menuOpen ? <Close /> : <Menu />}
-					</IconButton>
-					<MobileMenu $open={menuOpen}>
-						<MobileButton
+				{isMobile ? (
+					<MobileActions>
+						<IconButton
+							isIconOnly
 							variant="light"
-							onPress={() => {
-								setMenuOpen(false);
-								router.push("/");
-							}}
+							onPress={() => setMenuOpen((open) => !open)}
 						>
+							{menuOpen ? <Close /> : <Menu />}
+						</IconButton>
+						<MobileMenu $open={menuOpen}>
+							<MobileButton
+								variant="light"
+								onPress={() => {
+									setMenuOpen(false);
+									router.push("/");
+								}}
+							>
+								Accueil
+							</MobileButton>
+							<MobileButton
+								variant="light"
+								onPress={() => {
+									setMenuOpen(false);
+									router.push("/actus");
+								}}
+							>
+								Actualités
+							</MobileButton>
+							{user.data && (
+								<MobileButton
+									variant="light"
+									onPress={() => {
+										setMenuOpen(false);
+										router.push("/exercices");
+									}}
+								>
+									Exercices
+								</MobileButton>
+							)}
+							{!user.data && (
+								<MobileButton
+									variant="light"
+									startContent={<Login />}
+									onPress={() => {
+										setMenuOpen(false);
+										router.push("/login");
+									}}
+								>
+									Se connecter
+								</MobileButton>
+							)}
+
+							{user.data && <UserAccordion setIsDropdownOpen={setMenuOpen} />}
+						</MobileMenu>
+					</MobileActions>
+				) : (
+					<NavLinks>
+						<NavButton variant="light" onPress={() => router.push("/")}>
 							Accueil
-						</MobileButton>
-						<MobileButton
-							variant="light"
-							onPress={() => {
-								setMenuOpen(false);
-								router.push("/actus");
-							}}
-						>
+						</NavButton>
+						<NavButton variant="light" onPress={() => router.push("/actus")}>
 							Actualités
-						</MobileButton>
+						</NavButton>
 						{user.data && (
-							<MobileButton
-								variant="light"
-								onPress={() => {
-									setMenuOpen(false);
-									router.push("/exercices");
-								}}
-							>
-								Exercices
-							</MobileButton>
+							<>
+								<NavButton
+									variant="light"
+									onPress={() => router.push("/exercices")}
+								>
+									Exercices
+								</NavButton>
+								<UserDropdown />
+							</>
 						)}
+
 						{!user.data && (
-							<MobileButton
-								variant="light"
-								startContent={<Login />}
-								onPress={() => {
-									setMenuOpen(false);
-									router.push("/login");
-								}}
-							>
+							<LoginButton variant="flat" onPress={() => router.push("/login")}>
 								Se connecter
-							</MobileButton>
+							</LoginButton>
 						)}
-
-						{user.data && <UserAccordion />}
-					</MobileMenu>
-				</MobileActions>
-			) : (
-				<NavLinks>
-					<NavButton variant="light" onPress={() => router.push("/")}>
-						Accueil
-					</NavButton>
-					<NavButton variant="light" onPress={() => router.push("/actus")}>
-						Actualités
-					</NavButton>
-					{user.data && (
-						<>
-							<NavButton
-								variant="light"
-								onPress={() => router.push("/exercices")}
-							>
-								Exercices
-							</NavButton>
-							<UserDropdown />
-						</>
-					)}
-
-					{!user.data && (
-						<LoginButton variant="flat" onPress={() => router.push("/login")}>
-							Se connecter
-						</LoginButton>
-					)}
-				</NavLinks>
-			)}
-		</NavContainer>
+					</NavLinks>
+				)}
+			</NavContainer>
+		</StyleSheetManager>
 	);
 };
 

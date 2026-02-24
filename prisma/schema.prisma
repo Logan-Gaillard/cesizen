@@ -15,7 +15,7 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(uuid())
   nickname  String   @unique
   email     String   @unique
   pwdHash   String   @map("pwd_hash")
@@ -29,8 +29,8 @@ model User {
 }
 
 model Session {
-  id        Int      @id @default(autoincrement())
-  userId    Int      @map("user_id")
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
   token     String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -41,11 +41,14 @@ model Session {
 }
 
 model Information {
-  id        Int      @id @default(autoincrement())
-  userId    Int      @map("user_id")
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
   title     String
   description String
   content   String
+  imageURL String   @map("image_url")
+  category String
+  readTime String   @map("read_time")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -55,8 +58,8 @@ model Information {
 }
 
 model BreathExercices {
-  id       Int      @id @default(autoincrement())
-  userId    Int      @map("user_id")
+  id       String   @id @default(uuid())
+  userId    String   @map("user_id")
   title      String
   description String
   nb_loops   Int

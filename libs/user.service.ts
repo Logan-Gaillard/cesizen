@@ -13,6 +13,7 @@ export async function getSessionUser() {
 		select: {
 			user: {
 				select: {
+					id: true,
 					nickname: true,
 					email: true,
 					role: true,
@@ -36,4 +37,15 @@ export async function getUserNickname() {
 	});
 
 	return session?.user.nickname || null;
+}
+
+export async function getUserRole() {
+	const cookieStore = await cookies();
+	const token = cookieStore.get("cesi-session")?.value;
+	if (!token) return null;
+	const session = await prisma.session.findUnique({
+		where: { token },
+		select: { user: { select: { role: true } } },
+	});
+	return session?.user.role || null;
 }

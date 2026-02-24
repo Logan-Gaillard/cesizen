@@ -6,7 +6,7 @@ import {
 	useEffect,
 	useState,
 } from "react";
-import { getSessionUser } from "@/libs/auth";
+import { getSessionUser } from "@/libs/user.service";
 
 interface AuthSession {
 	nickname: string;

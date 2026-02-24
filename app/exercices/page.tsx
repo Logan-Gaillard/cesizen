@@ -13,15 +13,15 @@ type Phase = {
 	mode: "inspiration" | "expiration" | "tenir";
 };
 
-type Exercise = {
+export type Exercise = {
 	id: number;
 	title: string;
 	description: string;
 	phases: Phase[];
 };
 
-const exercises: Exercise[] = [
-	{
+const exercises: Record<string, Exercise> = {
+	"1": {
 		id: 1,
 		title: "Cohérence Cardiaque",
 		description:
@@ -31,7 +31,7 @@ const exercises: Exercise[] = [
 			{ name: "Expiration", duration: 5, mode: "expiration" },
 		],
 	},
-	{
+	"2": {
 		id: 2,
 		title: "Respiration 4-7-8",
 		description:
@@ -42,7 +42,7 @@ const exercises: Exercise[] = [
 			{ name: "Expiration", duration: 8, mode: "expiration" },
 		],
 	},
-	{
+	"3": {
 		id: 3,
 		title: "Respiration Carrée",
 		description:
@@ -54,7 +54,7 @@ const exercises: Exercise[] = [
 			{ name: "Rétention (vide)", duration: 4, mode: "tenir" },
 		],
 	},
-];
+};
 
 const playBeep = (frequency = 600, duration = 150) => {
 	const audioCtx = new (window.AudioContext || window.AudioContext)();
@@ -178,7 +178,7 @@ export default function RespirationPage() {
 						Exercices disponibles :
 					</Title>
 					<Flex direction="column" gap="16px">
-						{exercises.map((ex) => (
+						{Object.values(exercises).map((ex) => (
 							<Button
 								key={ex.id}
 								className={`h-auto flex-col items-start p-4 whitespace-normal text-left border transition-all ${selectedExercise?.id === ex.id ? "border-primary bg-primary-50" : "border-transparent bg-white hover:bg-gray-50"}`}

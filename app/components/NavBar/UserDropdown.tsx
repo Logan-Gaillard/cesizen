@@ -40,14 +40,25 @@ const UserDropdown = () => {
 				/>
 			</DropdownTrigger>
 			<DropdownMenu aria-label="User Actions" variant="flat">
-				<DropdownItem key="profile" color="primary" startContent={<Person />}>
+				<DropdownItem
+					key="profile"
+					color="primary"
+					startContent={<Person />}
+					onPress={() => router.push("/profile")}
+				>
 					Profile
 				</DropdownItem>
-				{isAdmin && (
-					<DropdownItem key="admin" color="primary" startContent={<Person />}>
+				{isAdmin ? (
+					<DropdownItem
+						key="admin"
+						color="primary"
+						startContent={<Person />}
+						onPress={() => router.push("/admin")}
+					>
 						Espace Administrateur
 					</DropdownItem>
-				)}
+				) : null}
+
 				<DropdownItem
 					key="logout"
 					color="danger"

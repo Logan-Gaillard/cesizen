@@ -1,6 +1,6 @@
 "use client";
 
-import { getSessionUser } from "@/libs/auth";
+import { getSessionUser } from "@/libs/user.service";
 import { useEffect, useState } from "react";
 
 const useIsAdmin = (): boolean => {

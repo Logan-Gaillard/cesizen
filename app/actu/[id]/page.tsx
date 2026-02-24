@@ -11,7 +11,7 @@ interface IAuthor {
 	role: string;
 }
 
-interface IActu {
+export interface IActu {
 	id: string;
 	title: string;
 	category: string;
@@ -89,7 +89,7 @@ const ActuId = ({ params }: { params: Promise<{ id: string }> }) => {
 	const author = users[currentActu.authorId];
 
 	return (
-		<Flex direction="column" gap="1rem" className="max-w-5xl mx-auto w-full">
+		<Flex direction="column" gap="1rem" className="max-w-6xl mx-auto w-full">
 			{/* Header Section */}
 			<Flex direction="column" className="gap-4 mb-4">
 				<Flex alignItems="center" gap="0.5rem">
@@ -135,7 +135,7 @@ const ActuId = ({ params }: { params: Promise<{ id: string }> }) => {
 			</Flex>
 
 			{/* Main Content Layout */}
-			<div className="flex flex-col lg:flex-row gap-12">
+			<Flex gap="2rem" className="lg:flex-row">
 				{/* Article Body */}
 				<div className="flex-1 space-y-8">
 					<p className="text-xl text-gray-600 font-serif leading-relaxed border-l-4 border-primary pl-4 italic">
@@ -177,10 +177,9 @@ const ActuId = ({ params }: { params: Promise<{ id: string }> }) => {
 							</p>
 							<p className="text-xs text-gray-600">
 								Cet article a été rédigé par {author?.name}
-								{author?.role === "admin" && " (Administrateur)"}
 							</p>
 							<p className="text-xs text-gray-600">
-								Publié le
+								Publié le{" "}
 								{new Date(currentActu.createdAt).toLocaleDateString("fr-FR", {
 									day: "numeric",
 									month: "long",
@@ -190,7 +189,7 @@ const ActuId = ({ params }: { params: Promise<{ id: string }> }) => {
 						</div>
 					</div>
 				</Flex>
-			</div>
+			</Flex>
 		</Flex>
 	);
 };

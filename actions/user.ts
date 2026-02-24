@@ -4,7 +4,7 @@ import argon2 from "argon2";
 
 import prisma from "@/libs/db";
 import { cookies } from "next/headers";
-import { getSessionUser } from "@/libs/auth";
+import { getSessionUser } from "@/libs/user.service";
 
 type CreateUserData = {
 	nickname: string;
@@ -17,7 +17,7 @@ export async function registerUser(data: CreateUserData) {
 		type: argon2.argon2id,
 	});
 
-	return await prisma.user.create({
+	const user = await prisma.user.create({
 		data: {
 			nickname: data.nickname,
 			email: data.email,
@@ -25,6 +25,14 @@ export async function registerUser(data: CreateUserData) {
 			role: "user",
 		},
 	});
+
+	if (!user) {
+		return {
+			success: false,
+			message: "Erreur lors de la création de l'utilisateur",
+		};
+	}
+	return { success: true, user };
 }
 
 export async function loginUser(
