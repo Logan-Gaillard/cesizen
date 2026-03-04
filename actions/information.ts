@@ -1,20 +1,8 @@
 "use server";
 
+import { IActu } from "@/context/useInformations";
 import prisma from "@/libs/db";
 import { getSessionUser } from "@/libs/user.service";
-
-interface IActu {
-	id: string;
-	title: string;
-	category: string;
-	readTime: string;
-	description: string;
-	content: string;
-	imageURL: string;
-	authorId: string;
-	createdAt: string;
-	updatedAt: string;
-}
 
 function calculateReadTime(content: string): string {
 	const wordsPerMinute = 200; // Vitesse de lecture moyenne
@@ -58,19 +46,23 @@ export async function createActu({
 	console.log("Nouvelle actu créée :", newActu);
 }
 
-export async function getAllActus() {
-	return await prisma.information.findMany({
+export async function getAllActus(): Promise<IActu[]> {
+	const actus = await prisma.information.findMany({
 		orderBy: { createdAt: "desc" },
-		select: {
-			id: true,
-			title: true,
-			category: true,
-			readTime: true,
-			description: true,
-			imageURL: true,
-			createdAt: true,
-		},
 	});
+
+	return actus.map((actu) => ({
+		id: actu.id,
+		title: actu.title,
+		category: actu.category,
+		readTime: actu.readTime,
+		description: actu.description,
+		content: actu.content,
+		imageURL: actu.imageURL,
+		authorId: actu.userId,
+		createdAt: actu.createdAt.toISOString(),
+		updatedAt: actu.updatedAt.toISOString(),
+	}));
 }
 
 export async function getActuById(id: string) {

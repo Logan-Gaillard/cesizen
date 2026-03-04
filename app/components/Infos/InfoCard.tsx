@@ -31,12 +31,13 @@ const InfoCard = ({
 			className={`w-fit p-4 cursor-pointer ${isMobile ? "w-full" : "max-w-lg"}`}
 			onPress={onPress}
 		>
-			<CardHeader>
+			<CardHeader className="w-full justify-center items-center">
 				<Image
 					alt={title}
-					className="aspect-video"
+					className="w-full aspect-video object-cover"
 					radius="lg"
 					src={imageUrl}
+					width="100%"
 				/>
 			</CardHeader>
 			<CardBody className="flex gap-2">

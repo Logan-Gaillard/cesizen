@@ -11,64 +11,18 @@ import {
 	ModalFooter,
 	ModalHeader,
 	Tab,
-	Table,
-	TableBody,
-	TableCell,
-	TableColumn,
-	TableHeader,
-	TableRow,
 	Tabs,
 	useDisclosure,
 } from "@heroui/react";
 import { Add, Delete, Edit, Search, Visibility } from "@mui/icons-material";
 import React, { useCallback, useState } from "react";
-import { Exercise } from "../exercices/page";
-import { IActu } from "../actu/[id]/page";
+import { IExercise } from "../exercices/page";
+import useInformations from "@/context/useInformations";
+import useAdminUsers from "@/context/useAdminUsers";
+import TableAdmin from "./TableAdmin";
+import { UserModalAdd, UserModalDelete, UserModalEdit } from "./userModal";
 
-// --- Mock Data ---
-const infos: Record<string, IActu> = {
-	"1": {
-		id: "1",
-		title: "Gérer son stress en période d'examens",
-		category: "Bien-être",
-		readTime: "5 min",
-		description:
-			"Découvrez nos techniques de respiration et d'organisation pour aborder vos partiels avec sérénité et efficacité.",
-		content:
-			"La période des examens est souvent synonyme de stress intense pour les étudiants. Entre la pression des résultats, la charge de travail et la peur de l'échec, il est facile de se sentir submergé.\n\nCependant, le stress n'est pas une fatalité. Il existe des méthodes éprouvées pour le canaliser et le transformer en énergie positive. Tout d'abord, la respiration. Des exercices simples de cohérence cardiaque peuvent faire baisser votre taux de cortisol en quelques minutes.\n\nEnsuite, l'organisation. Un planning de révision réaliste, incluant des pauses régulières, permet de garder le contrôle et d'éviter la procrastination. N'oubliez pas que votre cerveau a besoin de repos pour assimiler les informations.",
-		createdAt: "2024-06-15T10:00:00Z",
-		imageUrl: "https://picsum.photos/800/600?random=1",
-		authorId: "1",
-	},
-	"2": {
-		id: "2",
-		title: "L'importance du sommeil",
-		category: "Santé",
-		readTime: "4 min",
-		description:
-			"Un bon cycle de sommeil est la clé de la réussite académique. Apprenez à réguler votre horloge biologique.",
-		content:
-			"Le sommeil n'est pas une perte de temps, c'est un investissement pour votre cerveau. Durant la nuit, votre mémoire se consolide et votre corps se régénère.\n\nPour optimiser votre sommeil, essayez de vous coucher et de vous lever à des heures régulières, même le week-end. Évitez les écrans au moins une heure avant de dormir, car la lumière bleue perturbe la production de mélatonine.",
-		createdAt: "2024-06-10T08:30:00Z",
-		imageUrl: "https://picsum.photos/800/600?random=2",
-		authorId: "2",
-	},
-	"3": {
-		id: "3",
-		title: "Alimentation et concentration",
-		category: "Nutrition",
-		readTime: "6 min",
-		description:
-			"Quels aliments privilégier	pour booster votre mémoire ? Notre nutritionniste vous répond dans cet article détaillé.",
-		content:
-			"Votre cerveau est un grand consommateur d'énergie. Pour fonctionner à plein régime, il a besoin de nutriments spécifiques. Les oméga-3, présents dans les poissons gras et les noix, sont essentiels pour la mémoire.\n\nLes sucres lents (pâtes complètes, riz, légumineuses) fournissent une énergie durable et évitent les coups de fatigue. N'oubliez pas de bien vous hydrater : une légère déshydratation peut entraîner une baisse significative de la concentration.",
-		createdAt: "2024-06-01T12:00:00Z",
-		imageUrl: "https://picsum.photos/800/600?random=3",
-		authorId: "2",
-	},
-};
-
-const exercises: Record<string, Exercise> = {
+const exercises: Record<string, IExercise> = {
 	"1": {
 		id: 1,
 		title: "Cohérence Cardiaque",
@@ -104,33 +58,60 @@ const exercises: Record<string, Exercise> = {
 	},
 };
 
-const initialMembers: Record<string, any> = {
-	"1": {
-		id: 1,
-		nickname: "Alice Dupont",
-		role: "admin",
-		email: "alice.dupont@cesi.fr",
-	},
-	"2": {
-		id: 2,
-		nickname: "Jean Martin",
-		role: "user",
-		email: "jean.martin@viacesi.fr",
-	},
-	"3": {
-		id: 3,
-		nickname: "Sophie Bernard",
-		role: "user",
-		email: "sophie.bernard@external.fr",
-	},
-};
-
 const Admin = () => {
 	const { isOpen, onOpen, onOpenChange } = useDisclosure();
 	const [currentTab, setCurrentTab] = useState<string>("actus");
 	const [modalType, setModalType] = useState<"add" | "edit" | "delete" | null>(
 		null,
 	);
+	const [selectedItem, setSelectedItem] = useState<any>(null);
+
+	const users = useAdminUsers();
+	const { users, refreshUsers } = useAdminUsers();
+	const infos = useInformations();
+
+	console.log("infos:", infos);
+	const handleOpenModal = (
+		type: "add" | "edit" | "delete",
+		item: any = null,
+	) => {
+		setModalType(type);
+		setSelectedItem(item);
+		onOpen();
+	};
+
+	const renderModalContent = (onClose: () => void) => {
+		if (currentTab === "members") {
+			if (modalType === "add")
+				return <UserModalAdd onClose={onClose} refresh={refreshUsers} />;
+			if (modalType === "edit")
+				return (
+					<UserModalEdit
+						onClose={onClose}
+						refresh={refreshUsers}
+						user={selectedItem}
+					/>
+				);
+			if (modalType === "delete")
+				return (
+					<UserModalDelete
+						onClose={onClose}
+						refresh={refreshUsers}
+						user={selectedItem}
+					/>
+				);
+		}
+		return (
+			<>
+				<ModalBody>
+					<p>Fonctionnalité à venir pour {currentTab}</p>
+				</ModalBody>
+				<ModalFooter>
+					<Button onPress={onClose}>Fermer</Button>
+				</ModalFooter>
+			</>
+		);
+	};
 
 	return (
 		<Flex direction="column" gap className="max-w-6xl mx-auto w-full">
@@ -152,6 +133,39 @@ const Admin = () => {
 				selectedKey={currentTab}
 				onSelectionChange={(key) => setCurrentTab(key as string)}
 			>
+				{/* --- Onglet Membres --- */}
+				<Tab
+					key="members"
+					title={
+						<div className="flex items-center space-x-2">
+							<span>Membres</span>
+							<Chip size="sm" variant="faded">
+								{Object.keys(users).length}
+							</Chip>
+						</div>
+					}
+				>
+					<Flex direction="column" gap="1rem" className="mt-4" fullWidth>
+						<Flex justifyContent="flex-end" alignItems="center">
+							<Button
+								color="primary"
+								endContent={<Add />}
+								//onPress={() => handleOpenModal("add")}
+								onPress={() => handleOpenModal("add")}
+							>
+								Ajouter un membre
+							</Button>
+						</Flex>
+						<TableAdmin data={users} type="users" />
+						<TableAdmin
+							data={users}
+							type="users"
+							onEdit={(item) => handleOpenModal("edit", item)}
+							onDelete={(item) => handleOpenModal("delete", item)}
+						/>
+					</Flex>
+				</Tab>
+
 				{/* --- Onglet Actualités --- */}
 				<Tab
 					key="actus"
@@ -164,7 +178,7 @@ const Admin = () => {
 						</div>
 					}
 				>
-					<Flex direction="column" gap="1rem" className="mt-4">
+					<Flex fullWidth direction="column" gap="1rem" className="mt-4">
 						<Flex justifyContent="flex-end" alignItems="center">
 							<Button
 								color="primary"
@@ -174,22 +188,7 @@ const Admin = () => {
 								Ajouter une actualité
 							</Button>
 						</Flex>
-						<Table aria-label="Tableau des actualités">
-							<TableHeader>
-								<TableColumn key="title">TITRE</TableColumn>
-								<TableColumn key="category">CATÉGORIE</TableColumn>
-								<TableColumn key="author">AUTEUR</TableColumn>
-							</TableHeader>
-							<TableBody items={Object.values(infos)}>
-								{(item) => (
-									<TableRow key={item.id}>
-										<TableCell>{item.title}</TableCell>
-										<TableCell>{item.category}</TableCell>
-										<TableCell>{"Inconnu"}</TableCell>
-									</TableRow>
-								)}
-							</TableBody>
-						</Table>
+						<TableAdmin data={infos} type="infos" />
 					</Flex>
 				</Tab>
 
@@ -215,31 +214,7 @@ const Admin = () => {
 								Ajouter un exercice
 							</Button>
 						</Flex>
-					</Flex>
-				</Tab>
-
-				{/* --- Onglet Membres --- */}
-				<Tab
-					key="members"
-					title={
-						<div className="flex items-center space-x-2">
-							<span>Membres</span>
-							<Chip size="sm" variant="faded">
-								{Object.keys(initialMembers).length}
-							</Chip>
-						</div>
-					}
-				>
-					<Flex direction="column" gap="1rem" className="mt-4">
-						<Flex justifyContent="flex-end" alignItems="center">
-							<Button
-								color="primary"
-								endContent={<Add />}
-								//onPress={() => handleOpenModal("add")}
-							>
-								Ajouter un membre
-							</Button>
-						</Flex>
+						<TableAdmin data={exercises} type="exos" />
 					</Flex>
 				</Tab>
 			</Tabs>
@@ -273,6 +248,7 @@ const Admin = () => {
 									{modalType === "delete" ? "Confirmer" : "Enregistrer"}
 								</Button>
 							</ModalFooter>
+							{renderModalContent(onClose)}
 						</>
 					)}
 				</ModalContent>

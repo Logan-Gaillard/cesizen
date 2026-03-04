@@ -2,6 +2,7 @@
 
 import Flex from "@/app/components/utils/Flex";
 import Title from "@/app/components/utils/Title";
+import useInformations from "@/context/useInformations";
 import { Avatar, Chip, Divider, Image } from "@heroui/react";
 import * as React from "react";
 
@@ -9,18 +10,6 @@ interface IAuthor {
 	id: string;
 	name: string;
 	role: string;
-}
-
-export interface IActu {
-	id: string;
-	title: string;
-	category: string;
-	readTime: string;
-	description: string;
-	content: string;
-	createdAt: string;
-	imageUrl: string;
-	authorId: string;
 }
 
 const ActuId = ({ params }: { params: Promise<{ id: string }> }) => {
@@ -37,47 +26,7 @@ const ActuId = ({ params }: { params: Promise<{ id: string }> }) => {
 		},
 	};
 
-	const infos: Record<string, IActu> = {
-		"1": {
-			id: "1",
-			title: "Gérer son stress en période d'examens",
-			category: "Bien-être",
-			readTime: "5 min",
-			description:
-				"Découvrez nos techniques de respiration et d'organisation pour aborder vos partiels avec sérénité et efficacité.",
-			content:
-				"La période des examens est souvent synonyme de stress intense pour les étudiants. Entre la pression des résultats, la charge de travail et la peur de l'échec, il est facile de se sentir submergé.\n\nCependant, le stress n'est pas une fatalité. Il existe des méthodes éprouvées pour le canaliser et le transformer en énergie positive. Tout d'abord, la respiration. Des exercices simples de cohérence cardiaque peuvent faire baisser votre taux de cortisol en quelques minutes.\n\nEnsuite, l'organisation. Un planning de révision réaliste, incluant des pauses régulières, permet de garder le contrôle et d'éviter la procrastination. N'oubliez pas que votre cerveau a besoin de repos pour assimiler les informations.",
-			createdAt: "2024-06-15T10:00:00Z",
-			imageUrl: "https://picsum.photos/800/600?random=1",
-			authorId: "1",
-		},
-		"2": {
-			id: "2",
-			title: "L'importance du sommeil",
-			category: "Santé",
-			readTime: "4 min",
-			description:
-				"Un bon cycle de sommeil est la clé de la réussite académique. Apprenez à réguler votre horloge biologique.",
-			content:
-				"Le sommeil n'est pas une perte de temps, c'est un investissement pour votre cerveau. Durant la nuit, votre mémoire se consolide et votre corps se régénère.\n\nPour optimiser votre sommeil, essayez de vous coucher et de vous lever à des heures régulières, même le week-end. Évitez les écrans au moins une heure avant de dormir, car la lumière bleue perturbe la production de mélatonine.",
-			createdAt: "2024-06-10T08:30:00Z",
-			imageUrl: "https://picsum.photos/800/600?random=2",
-			authorId: "2",
-		},
-		"3": {
-			id: "3",
-			title: "Alimentation et concentration",
-			category: "Nutrition",
-			readTime: "6 min",
-			description:
-				"Quels aliments privilégier	pour booster votre mémoire ? Notre nutritionniste vous répond dans cet article détaillé.",
-			content:
-				"Votre cerveau est un grand consommateur d'énergie. Pour fonctionner à plein régime, il a besoin de nutriments spécifiques. Les oméga-3, présents dans les poissons gras et les noix, sont essentiels pour la mémoire.\n\nLes sucres lents (pâtes complètes, riz, légumineuses) fournissent une énergie durable et évitent les coups de fatigue. N'oubliez pas de bien vous hydrater : une légère déshydratation peut entraîner une baisse significative de la concentration.",
-			createdAt: "2024-06-01T12:00:00Z",
-			imageUrl: "https://picsum.photos/800/600?random=3",
-			authorId: "2",
-		},
-	};
+	const infos = useInformations();
 
 	const { id }: { id: string } = React.use(params);
 	const currentActu = infos[id];
@@ -135,7 +84,7 @@ const ActuId = ({ params }: { params: Promise<{ id: string }> }) => {
 			</Flex>
 
 			{/* Main Content Layout */}
-			<Flex gap="2rem" className="lg:flex-row">
+			<Flex gap="2rem" className="lg:flex-row" flexWrap="wrap">
 				{/* Article Body */}
 				<div className="flex-1 space-y-8">
 					<p className="text-xl text-gray-600 font-serif leading-relaxed border-l-4 border-primary pl-4 italic">
@@ -162,7 +111,7 @@ const ActuId = ({ params }: { params: Promise<{ id: string }> }) => {
 							className="w-full aspect-4/3 object-cover"
 							radius="lg"
 							shadow="sm"
-							src={currentActu.imageUrl}
+							src={currentActu.imageURL}
 							width="100%"
 						/>
 						<p className="text-xs text-center text-gray-400 italic">

@@ -92,3 +92,21 @@ export async function fetchCurrentUser() {
 		return null;
 	}
 }
+
+export async function getAllUsers() {
+	const currentUser = await getSessionUser();
+	if (!currentUser || currentUser.role !== "admin") {
+		throw new Error("Unauthorized");
+	}
+
+	const users = await prisma.user.findMany({
+		select: {
+			id: true,
+			nickname: true,
+			email: true,
+			role: true,
+		},
+	});
+
+	return users;
+}

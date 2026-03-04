@@ -4,6 +4,7 @@ import React from "react";
 import styled from "styled-components";
 
 interface IFlexProps {
+	display?: "flex" | "inline-flex";
 	children: React.ReactNode;
 	direction?: "row" | "column";
 	gap?: string | boolean;
@@ -36,6 +37,7 @@ interface IFlexProps {
 const Flex = styled.div.withConfig({
 	shouldForwardProp: (prop) =>
 		![
+			"display",
 			"direction",
 			"gap",
 			"justifyContent",
@@ -51,7 +53,7 @@ const Flex = styled.div.withConfig({
 			"grow",
 		].includes(prop),
 })<IFlexProps>`
-	display: flex;
+	display: ${(props) => props.display || "flex"};
 	${(props) => props.direction && `flex-direction: ${props.direction};`}
 	${(props) => props.gap && `gap: ${props.gap === true ? "1rem" : props.gap};`}
 	${(props) => props.padding && `padding: ${props.padding};`}

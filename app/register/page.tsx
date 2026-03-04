@@ -30,14 +30,13 @@ const Register = () => {
 	const [error, setError] = useState<{ message: string }>();
 
 	const onSubmit = handleSubmit(async (data) => {
-		console.log(data);
 		const result = await registerUser(data);
 		if (result.success) {
 			router.push("/login");
 		} else {
 			setError({
 				message:
-					result.message || "Une erreur est survenue lors de la connexion.",
+					result.message || "Une erreur est survenue lors de l'inscription.",
 			});
 		}
 		console.log(result);

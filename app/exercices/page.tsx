@@ -13,14 +13,14 @@ type Phase = {
 	mode: "inspiration" | "expiration" | "tenir";
 };
 
-export type Exercise = {
+export type IExercise = {
 	id: number;
 	title: string;
 	description: string;
 	phases: Phase[];
 };
 
-const exercises: Record<string, Exercise> = {
+const exercises: Record<string, IExercise> = {
 	"1": {
 		id: 1,
 		title: "Cohérence Cardiaque",
