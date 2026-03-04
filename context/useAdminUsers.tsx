@@ -11,25 +11,7 @@ export interface IUser {
 }
 
 const useAdminUsers = (): Record<string, IUser> => {
-	const [informations, setInformations] = useState<Record<string, IUser>>({});
-const useAdminUsers = () => {
 	const [users, setUsers] = useState<Record<string, IUser>>({});
-
-	const fetchUsers = async (): Promise<void> => {
-		try {
-			const data = await getAllUsers();
-			const usersMap: Record<string, IUser> = {};
-			data.forEach((user) => {
-				usersMap[user.id] = user;
-			});
-			setUsers(usersMap);
-		} catch (error) {
-			console.error(
-				"Erreur lors de la récupération des informations :",
-				error,
-			);
-		}
-	};
 
 	useEffect(() => {
 		if (typeof window === "undefined") {
@@ -38,12 +20,12 @@ const useAdminUsers = () => {
 
 		const fetchUsers = async (): Promise<void> => {
 			try {
-				const users = await getAllUsers();
-				const informationsMap: Record<string, IUser> = {};
-				users.forEach((user) => {
-					informationsMap[user.id] = user;
+				const data = await getAllUsers();
+				const usersMap: Record<string, IUser> = {};
+				data.forEach((user) => {
+					usersMap[user.id] = user;
 				});
-				setInformations(informationsMap);
+				setUsers(usersMap);
 			} catch (error) {
 				console.error(
 					"Erreur lors de la récupération des informations :",
@@ -55,8 +37,7 @@ const useAdminUsers = () => {
 		fetchUsers();
 	}, []);
 
-	return informations;
-	return { users, refreshUsers: fetchUsers };
+	return users;
 };
 
 export default useAdminUsers;
