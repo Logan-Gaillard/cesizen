@@ -1,7 +1,7 @@
 "use client";
 
 import { getAllActus } from "@/actions/information";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import useAdminUsers from "./useAdminUsers";
 
 export interface IActu {
@@ -12,42 +12,45 @@ export interface IActu {
 	description: string;
 	content: string;
 	imageURL: string;
-	authorId: string;
-	author?: string;
-	createdAt: string;
-	updatedAt: string;
+	author: string;
+	createdAt?: string;
+	updatedAt?: string;
 }
 
-const useInformations = (): Record<string, IActu> => {
-	const users = useAdminUsers();
+const useInformations = () => {
 	const [informations, setInformations] = useState<Record<string, IActu>>({});
 
-	useEffect(() => {
+	const fetchInformations = useCallback(async (): Promise<void> => {
 		if (typeof window === "undefined") {
 			return;
 		}
 
-		const fetchInformations = async (): Promise<void> => {
-			try {
-				const actus = await getAllActus();
-				const informationsMap: Record<string, IActu> = {};
-				actus.forEach((actu) => {
-					actu.author = users[actu.authorId]?.nickname || "Inconnu";
-					informationsMap[actu.id] = actu;
-				});
-				setInformations(informationsMap);
-			} catch (error) {
-				console.error(
-					"Erreur lors de la récupération des informations :",
-					error,
-				);
-			}
-		};
+		try {
+			const actus = await getAllActus();
+			const sortedInformations = Object.values(actus).sort((a, b) => {
+				const dateA = new Date(a.createdAt || "").getTime();
+				const dateB = new Date(b.createdAt || "").getTime();
+				return dateB - dateA;
+			});
+			setInformations(
+				sortedInformations.reduce(
+					(acc, actu) => {
+						acc[actu.id] = actu;
+						return acc;
+					},
+					{} as Record<string, IActu>,
+				),
+			);
+		} catch (error) {
+			console.error("Erreur lors de la récupération des informations :", error);
+		}
+	}, []);
 
+	useEffect(() => {
 		fetchInformations();
-	}, [users]);
+	}, [fetchInformations]);
 
-	return informations;
+	return { informations, fetchInformations };
 };
 
 export default useInformations;

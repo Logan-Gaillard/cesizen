@@ -38,12 +38,14 @@ const columns = {
 const TableAdmin = ({
 	data,
 	type,
+	openModal,
 }: {
 	data:
 		| Record<string, IUser>
 		| Record<string, IActu>
 		| Record<string, IExercise>;
 	type: "users" | "infos" | "exos";
+	openModal: (type: "add" | "edit" | "delete", itemId?: string) => void;
 }) => {
 	return (
 		<Table aria-label="Tableau des actualités">
@@ -57,23 +59,31 @@ const TableAdmin = ({
 							<TableCell key={column.key}>
 								{column.key === "actions" ? (
 									<Flex display="inline-flex" gap="0.5rem">
-										<Button
+										{/* <Button
 											variant="light"
 											color="primary"
 											size="sm"
 											isIconOnly
+											// onPress={() => onView(item)}
 										>
 											<Visibility />
-										</Button>
+										</Button> */}
 										<Button
 											variant="light"
 											color="primary"
 											size="sm"
 											isIconOnly
+											onPress={() => openModal?.("edit", item.id)}
 										>
 											<Edit />
 										</Button>
-										<Button variant="light" color="danger" size="sm" isIconOnly>
+										<Button
+											variant="light"
+											color="danger"
+											size="sm"
+											isIconOnly
+											onPress={() => openModal?.("delete", item.id)}
+										>
 											<Delete />
 										</Button>
 									</Flex>

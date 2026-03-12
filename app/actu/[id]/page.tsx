@@ -26,10 +26,10 @@ const ActuId = ({ params }: { params: Promise<{ id: string }> }) => {
 		},
 	};
 
-	const infos = useInformations();
+	const { informations } = useInformations();
 
 	const { id }: { id: string } = React.use(params);
-	const currentActu = infos[id];
+	const currentActu = informations[id];
 
 	if (!currentActu) {
 		return <div>Article non trouvé</div>;
@@ -74,7 +74,7 @@ const ActuId = ({ params }: { params: Promise<{ id: string }> }) => {
 						Publié le
 					</p>
 					<p className="text-sm font-medium text-gray-900">
-						{new Date(currentActu.createdAt).toLocaleDateString("fr-FR", {
+						{new Date(currentActu?.createdAt || 0).toLocaleDateString("fr-FR", {
 							day: "numeric",
 							month: "long",
 							year: "numeric",
@@ -129,11 +129,14 @@ const ActuId = ({ params }: { params: Promise<{ id: string }> }) => {
 							</p>
 							<p className="text-xs text-gray-600">
 								Publié le{" "}
-								{new Date(currentActu.createdAt).toLocaleDateString("fr-FR", {
-									day: "numeric",
-									month: "long",
-									year: "numeric",
-								})}
+								{new Date(currentActu?.createdAt || 0).toLocaleDateString(
+									"fr-FR",
+									{
+										day: "numeric",
+										month: "long",
+										year: "numeric",
+									},
+								)}
 							</p>
 						</div>
 					</div>

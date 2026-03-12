@@ -14,13 +14,14 @@ import {
 	Tabs,
 	useDisclosure,
 } from "@heroui/react";
-import { Add, Delete, Edit, Search, Visibility } from "@mui/icons-material";
-import React, { useCallback, useState } from "react";
+import { Add } from "@mui/icons-material";
+import { useState } from "react";
 import { IExercise } from "../exercices/page";
 import useInformations from "@/context/useInformations";
 import useAdminUsers from "@/context/useAdminUsers";
 import TableAdmin from "./TableAdmin";
-import { UserModalAdd, UserModalDelete, UserModalEdit } from "./userModal";
+import { UserModalAdd, UserModalDelete, UserModalEdit } from "./UserModal";
+import { InfoModalAdd, InfoModalDelete, InfoModalEdit } from "./InfoModal";
 
 const exercises: Record<string, IExercise> = {
 	"1": {
@@ -64,43 +65,73 @@ const Admin = () => {
 	const [modalType, setModalType] = useState<"add" | "edit" | "delete" | null>(
 		null,
 	);
-	const [selectedItem, setSelectedItem] = useState<any>(null);
+	const [selectedItem, setSelectedItem] = useState<string>();
 
-	const users = useAdminUsers();
-	const { users, refreshUsers } = useAdminUsers();
-	const infos = useInformations();
+	const { users, fetchUsers } = useAdminUsers();
+	const { informations, fetchInformations } = useInformations();
 
-	console.log("infos:", infos);
-	const handleOpenModal = (
-		type: "add" | "edit" | "delete",
-		item: any = null,
-	) => {
+	const handleOpenModal = ({
+		type,
+		itemId,
+	}: {
+		type: "add" | "edit" | "delete";
+		itemId?: string;
+	}) => {
 		setModalType(type);
-		setSelectedItem(item);
+		setSelectedItem(itemId);
 		onOpen();
+	};
+
+	const handleRefresh = () => {
+		fetchUsers();
+		fetchInformations();
 	};
 
 	const renderModalContent = (onClose: () => void) => {
 		if (currentTab === "members") {
-			if (modalType === "add")
-				return <UserModalAdd onClose={onClose} refresh={refreshUsers} />;
-			if (modalType === "edit")
-				return (
-					<UserModalEdit
-						onClose={onClose}
-						refresh={refreshUsers}
-						user={selectedItem}
-					/>
-				);
-			if (modalType === "delete")
-				return (
-					<UserModalDelete
-						onClose={onClose}
-						refresh={refreshUsers}
-						user={selectedItem}
-					/>
-				);
+			switch (modalType) {
+				case "add":
+					return <UserModalAdd onClose={onClose} onAdd={handleRefresh} />;
+				case "edit":
+					return (
+						<UserModalEdit
+							onClose={onClose}
+							onEdit={handleRefresh}
+							userId={selectedItem}
+						/>
+					);
+				case "delete":
+					return (
+						<UserModalDelete
+							onClose={onClose}
+							onDelete={handleRefresh}
+							userId={selectedItem}
+						/>
+					);
+			}
+		} else if (currentTab === "actus") {
+			switch (modalType) {
+				case "add":
+					return <InfoModalAdd onClose={onClose} onAdd={handleRefresh} />;
+				case "edit":
+					return (
+						<InfoModalEdit
+							onClose={onClose}
+							onEdit={handleRefresh}
+							infoId={selectedItem}
+						/>
+					);
+				case "delete":
+					return (
+						<InfoModalDelete
+							onClose={onClose}
+							onDelete={handleRefresh}
+							infoId={selectedItem}
+						/>
+					);
+			}
 		}
+
 		return (
 			<>
 				<ModalBody>
@@ -150,18 +181,15 @@ const Admin = () => {
 							<Button
 								color="primary"
 								endContent={<Add />}
-								//onPress={() => handleOpenModal("add")}
-								onPress={() => handleOpenModal("add")}
+								onPress={() => handleOpenModal({ type: "add" })}
 							>
 								Ajouter un membre
 							</Button>
 						</Flex>
-						<TableAdmin data={users} type="users" />
 						<TableAdmin
 							data={users}
 							type="users"
-							onEdit={(item) => handleOpenModal("edit", item)}
-							onDelete={(item) => handleOpenModal("delete", item)}
+							openModal={(type, itemId) => handleOpenModal({ type, itemId })}
 						/>
 					</Flex>
 				</Tab>
@@ -173,7 +201,7 @@ const Admin = () => {
 						<div className="flex items-center space-x-2">
 							<span>Actualités</span>
 							<Chip size="sm" variant="faded">
-								{Object.keys(infos).length}
+								{Object.keys(informations).length}
 							</Chip>
 						</div>
 					}
@@ -183,12 +211,16 @@ const Admin = () => {
 							<Button
 								color="primary"
 								endContent={<Add />}
-								//onPress={() => handleOpenModal("add")}
+								onPress={() => handleOpenModal({ type: "add" })}
 							>
 								Ajouter une actualité
 							</Button>
 						</Flex>
-						<TableAdmin data={infos} type="infos" />
+						<TableAdmin
+							data={informations}
+							type="infos"
+							openModal={(type, itemId) => handleOpenModal({ type, itemId })}
+						/>
 					</Flex>
 				</Tab>
 
@@ -214,7 +246,11 @@ const Admin = () => {
 								Ajouter un exercice
 							</Button>
 						</Flex>
-						<TableAdmin data={exercises} type="exos" />
+						<TableAdmin
+							data={exercises}
+							type="exos"
+							openModal={(type, itemId) => handleOpenModal({ type, itemId })}
+						/>
 					</Flex>
 				</Tab>
 			</Tabs>
@@ -236,18 +272,6 @@ const Admin = () => {
 										? "un exercice"
 										: "un membre"}
 							</ModalHeader>
-							<ModalBody>{/* {renderModalContent()} */}</ModalBody>
-							<ModalFooter>
-								<Button color="danger" variant="flat" onPress={onClose}>
-									Annuler
-								</Button>
-								<Button
-									color={modalType === "delete" ? "danger" : "primary"}
-									onPress={onClose}
-								>
-									{modalType === "delete" ? "Confirmer" : "Enregistrer"}
-								</Button>
-							</ModalFooter>
 							{renderModalContent(onClose)}
 						</>
 					)}

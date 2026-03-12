@@ -30,6 +30,10 @@ const Register = () => {
 	const [error, setError] = useState<{ message: string }>();
 
 	const onSubmit = handleSubmit(async (data) => {
+		if (data.password !== data.confirmPassword) {
+			setError({ message: "Les mots de passe ne correspondent pas." });
+			return;
+		}
 		const result = await registerUser(data);
 		if (result.success) {
 			router.push("/login");

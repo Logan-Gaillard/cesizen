@@ -6,16 +6,40 @@ import prisma from "@/libs/db";
 import { cookies } from "next/headers";
 import { getSessionUser } from "@/libs/user.service";
 
-type CreateUserData = {
+export type CreateUserData = {
 	nickname: string;
 	email: string;
 	password: string;
+	confirmPassword?: string;
 };
 
 export async function registerUser(data: CreateUserData) {
+	if (data.password !== data.confirmPassword) {
+		return {
+			success: false,
+			message: "Les mots de passe ne correspondent pas.",
+		};
+	}
+
 	const hash = await argon2.hash(data.password, {
 		type: argon2.argon2id,
 	});
+
+	const existingUser = await prisma.user.findFirst({
+		where: {
+			OR: [{ nickname: data.nickname }, { email: data.email }],
+		},
+	});
+
+	if (existingUser) {
+		const isNickname = existingUser.nickname === data.nickname;
+		return {
+			success: false,
+			message: isNickname
+				? "Un utilisateur avec ce nom d'utilisateur existe déjà"
+				: "Un utilisateur avec cet email existe déjà",
+		};
+	}
 
 	const user = await prisma.user.create({
 		data: {
@@ -109,4 +133,58 @@ export async function getAllUsers() {
 	});
 
 	return users;
+}
+
+export async function getNameById(id: string) {
+	const user = await prisma.user.findUnique({
+		where: { id },
+		select: {
+			nickname: true,
+		},
+	});
+
+	return user?.nickname || "Inconnu";
+}
+
+export async function deleteUser(id: string) {
+	const currentUser = await getSessionUser();
+	if (!currentUser || currentUser.role !== "admin") {
+		throw new Error("Unauthorized");
+	}
+
+	await prisma.user.delete({ where: { id } });
+}
+
+export async function updateUser(id: string, data: Partial<CreateUserData>) {
+	const currentUser = await getSessionUser();
+	if (!currentUser || currentUser.role !== "admin") {
+		throw new Error("Unauthorized");
+	}
+
+	const hash = await argon2.hash(data.password || "", {
+		type: argon2.argon2id,
+	});
+
+	await prisma.user.update({
+		where: { id },
+		data: {
+			nickname: data.nickname,
+			email: data.email,
+			pwdHash: hash,
+		},
+	});
+}
+
+export async function changeUserRole(id: string, role: string) {
+	const currentUser = await getSessionUser();
+	if (!currentUser || currentUser.role !== "admin") {
+		throw new Error("Unauthorized");
+	}
+
+	await prisma.user.update({
+		where: { id },
+		data: {
+			role,
+		},
+	});
 }

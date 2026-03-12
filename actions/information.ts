@@ -51,6 +51,18 @@ export async function getAllActus(): Promise<IActu[]> {
 		orderBy: { createdAt: "desc" },
 	});
 
+	const users = await prisma.user.findMany({
+		where: {
+			informations: {
+				some: {
+					id: {
+						in: actus.map((actu) => actu.id),
+					},
+				},
+			},
+		},
+	});
+
 	return actus.map((actu) => ({
 		id: actu.id,
 		title: actu.title,
@@ -59,7 +71,9 @@ export async function getAllActus(): Promise<IActu[]> {
 		description: actu.description,
 		content: actu.content,
 		imageURL: actu.imageURL,
-		authorId: actu.userId,
+		author:
+			users.find((user) => user.id === actu.userId)?.nickname ||
+			"Non renseigné",
 		createdAt: actu.createdAt.toISOString(),
 		updatedAt: actu.updatedAt.toISOString(),
 	}));
@@ -73,4 +87,22 @@ export async function getActuById(id: string) {
 
 export async function deleteActu(id: string) {
 	await prisma.information.delete({ where: { id } });
+}
+
+export async function updateActu(
+	id: string,
+	{ title, description, content, category, imageURL }: IActu,
+) {
+	const readTime = calculateReadTime(content);
+	await prisma.information.update({
+		where: { id },
+		data: {
+			title,
+			description,
+			content,
+			category,
+			imageURL,
+			readTime,
+		},
+	});
 }

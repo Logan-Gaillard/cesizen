@@ -9,7 +9,7 @@ import useInformations from "@/context/useInformations";
 const Actu = () => {
 	const router = useRouter();
 	const isMobile = useIsMobile();
-	const infos = useInformations();
+	const { informations } = useInformations();
 
 	return (
 		<Flex
@@ -28,16 +28,17 @@ const Actu = () => {
 			<Flex
 				flexWrap="wrap"
 				gap="24px"
-				justifyContent="center"
-				alignItems="stretch"
+				justifyContent="flex-start"
+				alignItems="center"
+				alignContent="flex-start"
 				fullWidth
 			>
-				{Object.values(infos).map((info) => (
+				{Object.values(informations).map((info) => (
 					<InfoCard
 						key={info.id}
 						title={info.title}
 						description={info.description}
-						createdAt={info.createdAt}
+						createdAt={info.createdAt || ""}
 						imageUrl={info.imageURL}
 						onPress={() => router.push(`/actu/${info.id}`)}
 					/>
