@@ -11,6 +11,7 @@ import {
 	deleteUser,
 	updateUser,
 	CreateUserData,
+	EditUserData,
 } from "@/actions/user";
 
 interface IModalProps {
@@ -22,7 +23,7 @@ interface IModalProps {
 }
 
 const UserModalAdd = ({ onClose, onAdd }: IModalProps) => {
-	const methods = useForm({
+	const methods = useForm<CreateUserData>({
 		defaultValues: {
 			nickname: "",
 			email: "",
@@ -70,7 +71,7 @@ const UserModalEdit = ({ onClose, userId, onEdit }: IModalProps) => {
 	const { users: adminUsers } = useAdminUsers();
 	const user: IUser | undefined = userId ? adminUsers[userId] : undefined;
 
-	const methods = useForm({
+	const methods = useForm<EditUserData>({
 		values: {
 			nickname: user?.nickname ?? "",
 			email: user?.email ?? "",
@@ -80,7 +81,7 @@ const UserModalEdit = ({ onClose, userId, onEdit }: IModalProps) => {
 
 	if (!user) return null;
 
-	const onSubmit = async (data: CreateUserData) => {
+	const onSubmit = async (data: EditUserData) => {
 		try {
 			if (user?.id) {
 				await updateUser(user.id, data);
@@ -135,7 +136,7 @@ const UserModalDelete = ({ onClose, userId, onDelete }: IModalProps) => {
 		<>
 			<ModalBody>
 				<p>
-					Êtes-vous sûr de vouloir supprimer l'utilisateur{" "}
+					Êtes-vous sûr de vouloir supprimer cet utilisateur{" "}
 					<strong>{user?.nickname}</strong> ?
 				</p>
 				<p className="text-sm text-gray-500">Cette action est irréversible.</p>

@@ -70,7 +70,7 @@ const playBeep = (frequency = 600, duration = 150) => {
 
 export default function RespirationPage() {
 	const [isPlaying, setIsPlaying] = useState(false);
-	const [selectedExercise, setSelectedExercise] = useState<Exercise>();
+	const [selectedExercise, setSelectedExercise] = useState<IExercise>();
 	const [currentPhaseIndex, setCurrentPhaseIndex] = useState(0);
 	const [timeLeft, setTimeLeft] = useState(0);
 	const [maxCycleTime, setMaxCycleTime] = useState(3);
@@ -80,7 +80,7 @@ export default function RespirationPage() {
 
 	const currentPhase = selectedExercise?.phases[currentPhaseIndex];
 
-	const selectExercise = (exercise: Exercise) => {
+	const selectExercise = (exercise: IExercise) => {
 		setSelectedExercise(exercise);
 		setCurrentPhaseIndex(0);
 		setTimeLeft(exercise.phases[0].duration);

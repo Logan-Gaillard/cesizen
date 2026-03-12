@@ -5,14 +5,14 @@ import { useCallback, useEffect, useState } from "react";
 import useAdminUsers from "./useAdminUsers";
 
 export interface IActu {
-	id: string;
+	id?: string;
 	title: string;
 	category: string;
 	readTime?: string;
 	description: string;
 	content: string;
 	imageURL: string;
-	author: string;
+	author?: string;
 	createdAt?: string;
 	updatedAt?: string;
 }
@@ -35,7 +35,7 @@ const useInformations = () => {
 			setInformations(
 				sortedInformations.reduce(
 					(acc, actu) => {
-						acc[actu.id] = actu;
+						acc[actu.id || "id"] = actu;
 						return acc;
 					},
 					{} as Record<string, IActu>,

@@ -10,7 +10,14 @@ export type CreateUserData = {
 	nickname: string;
 	email: string;
 	password: string;
+	role?: string;
 	confirmPassword?: string;
+};
+
+export type EditUserData = {
+	nickname: string;
+	email: string;
+	role: string;
 };
 
 export async function registerUser(data: CreateUserData) {
@@ -46,7 +53,7 @@ export async function registerUser(data: CreateUserData) {
 			nickname: data.nickname,
 			email: data.email,
 			pwdHash: hash,
-			role: "user",
+			role: data.role || "user",
 		},
 	});
 

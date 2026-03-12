@@ -141,7 +141,7 @@ const InfoModalDelete = ({ onClose, infoId, onDelete }: IModalProps) => {
 		<>
 			<ModalBody>
 				<p>
-					Êtes-vous sûr de vouloir supprimer l'actualité{" "}
+					Êtes-vous sûr de vouloir supprimer cette actualité{" "}
 					<strong>{info?.title}</strong> ?
 				</p>
 				<p className="text-sm text-gray-500">Cette action est irréversible.</p>

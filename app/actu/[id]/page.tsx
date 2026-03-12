@@ -35,7 +35,7 @@ const ActuId = ({ params }: { params: Promise<{ id: string }> }) => {
 		return <div>Article non trouvé</div>;
 	}
 
-	const author = users[currentActu.author];
+	const author = currentActu.author ? users[currentActu.author] : null;
 
 	return (
 		<Flex direction="column" gap="1rem" className="max-w-6xl mx-auto w-full">
@@ -125,7 +125,8 @@ const ActuId = ({ params }: { params: Promise<{ id: string }> }) => {
 								À propos
 							</p>
 							<p className="text-xs text-gray-600">
-								Cet article a été rédigé par {author?.name}
+								Cet article a été rédigé par{" "}
+								{author ? author.name : "Utilisateur inconnu"}
 							</p>
 							<p className="text-xs text-gray-600">
 								Publié le{" "}
