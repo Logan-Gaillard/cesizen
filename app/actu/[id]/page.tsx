@@ -35,7 +35,7 @@ const ActuId = ({ params }: { params: Promise<{ id: string }> }) => {
 		return <div>Article non trouvé</div>;
 	}
 
-	const author = users[currentActu.authorId];
+	const author = users[currentActu.author];
 
 	return (
 		<Flex direction="column" gap="1rem" className="max-w-6xl mx-auto w-full">
