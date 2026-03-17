@@ -13,19 +13,6 @@ interface IAuthor {
 }
 
 const ActuId = ({ params }: { params: Promise<{ id: string }> }) => {
-	const users: Record<string, IAuthor> = {
-		"1": {
-			id: "1",
-			name: "Alice Dupont",
-			role: "admin",
-		},
-		"2": {
-			id: "2",
-			name: "Dr. Marc Levy",
-			role: "user",
-		},
-	};
-
 	const { informations } = useInformations();
 
 	const { id }: { id: string } = React.use(params);
@@ -35,7 +22,7 @@ const ActuId = ({ params }: { params: Promise<{ id: string }> }) => {
 		return <div>Article non trouvé</div>;
 	}
 
-	const author = currentActu.author ? users[currentActu.author] : null;
+	console.log("Informations actu:", currentActu);
 
 	return (
 		<Flex direction="column" gap="1rem" className="max-w-6xl mx-auto w-full">
@@ -111,7 +98,7 @@ const ActuId = ({ params }: { params: Promise<{ id: string }> }) => {
 							className="w-full aspect-4/3 object-cover"
 							radius="lg"
 							shadow="sm"
-							src={currentActu.imageURL}
+							src={currentActu.imageURL || "/placeholder_img.png"}
 							width="100%"
 						/>
 						<p className="text-xs text-center text-gray-400 italic">
@@ -126,7 +113,7 @@ const ActuId = ({ params }: { params: Promise<{ id: string }> }) => {
 							</p>
 							<p className="text-xs text-gray-600">
 								Cet article a été rédigé par{" "}
-								{author ? author.name : "Utilisateur inconnu"}
+								{currentActu.author || "Utilisateur inconnu"}
 							</p>
 							<p className="text-xs text-gray-600">
 								Publié le{" "}

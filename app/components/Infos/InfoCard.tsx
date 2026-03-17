@@ -36,7 +36,7 @@ const InfoCard = ({
 						wrapper: "w-full !max-w-full h-auto",
 					}}
 					radius="lg"
-					src={imageUrl}
+					src={imageUrl || "/placeholder_img.png"}
 				/>
 			</CardHeader>
 			<CardBody className="flex flex-col gap-2 w-full p-4">

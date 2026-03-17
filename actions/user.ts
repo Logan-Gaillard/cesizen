@@ -20,6 +20,17 @@ export type EditUserData = {
 	role: string;
 };
 
+export type UpdateCurrentProfileData = {
+	nickname: string;
+	email: string;
+};
+
+export type ChangeCurrentPasswordData = {
+	currentPassword: string;
+	newPassword: string;
+	confirmPassword: string;
+};
+
 export async function registerUser(data: CreateUserData) {
 	if (data.password !== data.confirmPassword) {
 		return {
@@ -119,7 +130,7 @@ export async function fetchCurrentUser() {
 
 		// On ne renvoie que ce qui est nécessaire (pas le mot de passe !)
 		return { nickname: user.nickname };
-	} catch (e) {
+	} catch {
 		return null;
 	}
 }
@@ -194,4 +205,108 @@ export async function changeUserRole(id: string, role: string) {
 			role,
 		},
 	});
+}
+
+export async function updateCurrentUserProfile(data: UpdateCurrentProfileData) {
+	const currentUser = await getSessionUser();
+	if (!currentUser) {
+		return { success: false, message: "Utilisateur non authentifié." };
+	}
+
+	const nickname = data.nickname.trim();
+	const email = data.email.trim().toLowerCase();
+
+	if (!nickname || !email) {
+		return {
+			success: false,
+			message: "Le pseudo et l'email sont requis.",
+		};
+	}
+
+	const existingUser = await prisma.user.findFirst({
+		where: {
+			OR: [{ nickname }, { email }],
+			NOT: { id: currentUser.id },
+		},
+	});
+
+	if (existingUser) {
+		const isNickname = existingUser.nickname === nickname;
+		return {
+			success: false,
+			message: isNickname
+				? "Ce pseudo est déjà utilisé."
+				: "Cet email est déjà utilisé.",
+		};
+	}
+
+	await prisma.user.update({
+		where: { id: currentUser.id },
+		data: {
+			nickname,
+			email,
+		},
+	});
+
+	return {
+		success: true,
+		message: "Informations personnelles mises à jour.",
+	};
+}
+
+export async function changeCurrentUserPassword(
+	data: ChangeCurrentPasswordData,
+) {
+	const currentUser = await getSessionUser();
+	if (!currentUser) {
+		return { success: false, message: "Utilisateur non authentifié." };
+	}
+
+	if (data.newPassword !== data.confirmPassword) {
+		return {
+			success: false,
+			message: "Les nouveaux mots de passe ne correspondent pas.",
+		};
+	}
+
+	if (data.currentPassword === data.newPassword) {
+		return {
+			success: false,
+			message: "Le nouveau mot de passe doit être différent de l'actuel.",
+		};
+	}
+
+	const user = await prisma.user.findUnique({
+		where: { id: currentUser.id },
+		select: { pwdHash: true },
+	});
+
+	if (!user) {
+		return { success: false, message: "Utilisateur introuvable." };
+	}
+
+	const isCurrentValid = await argon2.verify(
+		user.pwdHash,
+		data.currentPassword,
+	);
+	if (!isCurrentValid) {
+		return {
+			success: false,
+			message: "Le mot de passe actuel est incorrect.",
+		};
+	}
+
+	const newHash = await argon2.hash(data.newPassword, {
+		type: argon2.argon2id,
+	});
+
+	await prisma.user.update({
+		where: { id: currentUser.id },
+		data: { pwdHash: newHash },
+	});
+
+	return {
+		success: true,
+		message: "Mot de passe modifié avec succès.",
+	};
 }

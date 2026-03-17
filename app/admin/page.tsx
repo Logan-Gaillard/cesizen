@@ -23,45 +23,9 @@ import TableAdmin from "./TableAdmin";
 import { UserModalAdd, UserModalDelete, UserModalEdit } from "./UserModal";
 import { InfoModalAdd, InfoModalDelete, InfoModalEdit } from "./InfoModal";
 
-const exercises: Record<string, IExercise> = {
-	"1": {
-		id: 1,
-		title: "Cohérence Cardiaque",
-		description:
-			"Idéal pour réduire le stress. Inspirez sur 5 secondes, expirez sur 5 secondes.",
-		phases: [
-			{ name: "Inspiration", duration: 5, mode: "inspiration" },
-			{ name: "Expiration", duration: 5, mode: "expiration" },
-		],
-	},
-	"2": {
-		id: 2,
-		title: "Respiration 4-7-8",
-		description:
-			"Favorise l'endormissement. Inspirez (4s), retenez (7s), expirez (8s).",
-		phases: [
-			{ name: "Inspiration", duration: 4, mode: "inspiration" },
-			{ name: "Rétention", duration: 7, mode: "tenir" },
-			{ name: "Expiration", duration: 8, mode: "expiration" },
-		],
-	},
-	"3": {
-		id: 3,
-		title: "Respiration Carrée",
-		description:
-			"Booste la concentration. 4 temps égaux pour chaque phase du cycle.",
-		phases: [
-			{ name: "Inspiration", duration: 4, mode: "inspiration" },
-			{ name: "Rétention (plein)", duration: 4, mode: "tenir" },
-			{ name: "Expiration", duration: 4, mode: "expiration" },
-			{ name: "Rétention (vide)", duration: 4, mode: "tenir" },
-		],
-	},
-};
-
 const Admin = () => {
 	const { isOpen, onOpen, onOpenChange } = useDisclosure();
-	const [currentTab, setCurrentTab] = useState<string>("actus");
+	const [currentTab, setCurrentTab] = useState<string>("members");
 	const [modalType, setModalType] = useState<"add" | "edit" | "delete" | null>(
 		null,
 	);
@@ -225,7 +189,7 @@ const Admin = () => {
 				</Tab>
 
 				{/* --- Onglet Exercices --- */}
-				<Tab
+				{/* <Tab
 					key="exos"
 					title={
 						<div className="flex items-center space-x-2">
@@ -252,7 +216,7 @@ const Admin = () => {
 							openModal={(type, itemId) => handleOpenModal({ type, itemId })}
 						/>
 					</Flex>
-				</Tab>
+				</Tab>*/}
 			</Tabs>
 
 			{/* --- Modal Global --- */}

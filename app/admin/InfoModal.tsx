@@ -50,7 +50,12 @@ const InfoModalAdd = ({ onClose, onAdd }: IModalProps) => {
 					/>
 					<FormTextArea name="content" label="Contenu" type="text" />
 					<FormInput name="category" label="Catégorie" type="text" />
-					<FormInput name="imageURL" label="URL de l'image" type="text" />
+					<FormInput
+						name="imageURL"
+						label="URL de l'image"
+						type="text"
+						required={false}
+					/>
 				</Flex>
 			</ModalBody>
 			<ModalFooter>
@@ -104,7 +109,12 @@ const InfoModalEdit = ({ onClose, infoId, onEdit }: IModalProps) => {
 					<FormInput name="description" label="Description" type="text" />
 					<FormTextArea name="content" label="Contenu" type="text" />
 					<FormInput name="category" label="Catégorie" type="text" />
-					<FormInput name="imageURL" label="URL de l'image" type="text" />
+					<FormInput
+						name="imageURL"
+						label="URL de l'image"
+						type="text"
+						required={false}
+					/>
 				</Flex>
 			</ModalBody>
 			<ModalFooter>
@@ -141,7 +151,7 @@ const InfoModalDelete = ({ onClose, infoId, onDelete }: IModalProps) => {
 		<>
 			<ModalBody>
 				<p>
-					Êtes-vous sûr de vouloir supprimer cette actualité{" "}
+					Êtes-vous sûr de vouloir supprimer l'actualité{" "}
 					<strong>{info?.title}</strong> ?
 				</p>
 				<p className="text-sm text-gray-500">Cette action est irréversible.</p>

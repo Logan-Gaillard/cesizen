@@ -13,6 +13,7 @@ import {
 	CreateUserData,
 	EditUserData,
 } from "@/actions/user";
+import FormSelect from "../components/form/FormSelect";
 
 interface IModalProps {
 	onClose: () => void;
@@ -49,7 +50,7 @@ const UserModalAdd = ({ onClose, onAdd }: IModalProps) => {
 					<FormInput name="nickname" label="Pseudo" type="text" />
 					<FormInput name="email" label="Email" type="email" />
 					<FormInput name="password" label="Mot de passe" type="password" />
-					<FormInput name="role" label="Rôle" type="text" />
+					<FormSelect name="role" items={[{ key: "user", value: "Utilisateur" }, { key: "admin", value: "Administrateur" }]} label="Rôle"/>
 				</Flex>
 			</ModalBody>
 			<ModalFooter>
@@ -99,7 +100,7 @@ const UserModalEdit = ({ onClose, userId, onEdit }: IModalProps) => {
 				<Flex direction="column" gap="1rem">
 					<FormInput name="nickname" label="Pseudo" type="text" />
 					<FormInput name="email" label="Email" type="email" />
-					<FormInput name="role" label="Rôle" type="text" />
+					<FormSelect name="role" items={[{ key: "user", value: "Utilisateur" }, { key: "admin", value: "Administrateur" }]} label="Rôle"/>
 				</Flex>
 			</ModalBody>
 			<ModalFooter>

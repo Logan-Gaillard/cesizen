@@ -1,16 +1,17 @@
 "use client";
 
-import { Card, Button, NumberInput } from "@heroui/react";
+import { Card, Button, NumberInput, Select, SelectItem } from "@heroui/react";
 import { Pause, PlayArrow, Stop } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import Flex from "../components/utils/Flex";
 import Title from "../components/utils/Title";
 import useIsMobile from "@/context/useIsMobile";
 
+type PhaseMode = "inspiration" | "expiration" | "tenir";
+
 type Phase = {
-	name: string;
 	duration: number;
-	mode: "inspiration" | "expiration" | "tenir";
+	mode: PhaseMode;
 };
 
 export type IExercise = {
@@ -23,38 +24,47 @@ export type IExercise = {
 const exercises: Record<string, IExercise> = {
 	"1": {
 		id: 1,
-		title: "Cohérence Cardiaque",
+		title: "Exercice de relaxation profonde",
 		description:
-			"Idéal pour réduire le stress. Inspirez sur 5 secondes, expirez sur 5 secondes.",
+			"Utilisé pour l'endormissement ou réduire une forte anxiété en activant le système parasympathique.",
 		phases: [
-			{ name: "Inspiration", duration: 5, mode: "inspiration" },
-			{ name: "Expiration", duration: 5, mode: "expiration" },
+			{ duration: 4, mode: "inspiration" },
+			{ duration: 7, mode: "tenir" },
+			{ duration: 8, mode: "expiration" },
 		],
 	},
 	"2": {
 		id: 2,
-		title: "Respiration 4-7-8",
+		title: "Exercice d'équilibrage",
 		description:
-			"Favorise l'endormissement. Inspirez (4s), retenez (7s), expirez (8s).",
+			"Utilisé pour stabiliser le rythme cardiaque et gérer le stress quotidien de manière neutre.",
 		phases: [
-			{ name: "Inspiration", duration: 4, mode: "inspiration" },
-			{ name: "Rétention", duration: 7, mode: "tenir" },
-			{ name: "Expiration", duration: 8, mode: "expiration" },
+			{ duration: 5, mode: "inspiration" },
+			{ duration: 5, mode: "expiration" },
 		],
 	},
 	"3": {
 		id: 3,
-		title: "Respiration Carrée",
+		title: "Exercice de calme léger",
 		description:
-			"Booste la concentration. 4 temps égaux pour chaque phase du cycle.",
+			"L'expiration prolongée favorise la détente sans l'intensité de l'apnée, idéal pour se recentrer rapidement.",
 		phases: [
-			{ name: "Inspiration", duration: 4, mode: "inspiration" },
-			{ name: "Rétention (plein)", duration: 4, mode: "tenir" },
-			{ name: "Expiration", duration: 4, mode: "expiration" },
-			{ name: "Rétention (vide)", duration: 4, mode: "tenir" },
+			{ duration: 4, mode: "inspiration" },
+			{ duration: 6, mode: "expiration" },
 		],
 	},
 };
+
+const phaseModeLabels: Record<PhaseMode, string> = {
+	inspiration: "Inspiration",
+	expiration: "Expiration",
+	tenir: "Tenir",
+};
+
+const cloneExercise = (exercise: IExercise): IExercise => ({
+	...exercise,
+	phases: exercise.phases.map((phase) => ({ ...phase })),
+});
 
 const playBeep = (frequency = 600, duration = 150) => {
 	const audioCtx = new (window.AudioContext || window.AudioContext)();
@@ -79,11 +89,96 @@ export default function RespirationPage() {
 	const isMobile = useIsMobile();
 
 	const currentPhase = selectedExercise?.phases[currentPhaseIndex];
+	const canPlayExercise =
+		!!selectedExercise &&
+		selectedExercise.phases.length > 0 &&
+		selectedExercise.phases.every((phase) => phase.duration > 0);
 
 	const selectExercise = (exercise: IExercise) => {
-		setSelectedExercise(exercise);
+		const editableExercise = cloneExercise(exercise);
+		setSelectedExercise(editableExercise);
+		setIsPlaying(false);
 		setCurrentPhaseIndex(0);
-		setTimeLeft(exercise.phases[0].duration);
+		setTimeLeft(editableExercise.phases[0]?.duration ?? 0);
+		setCycleCount(0);
+	};
+
+	const updatePhase = (index: number, updates: Partial<Phase>) => {
+		setSelectedExercise((prev) => {
+			if (!prev) return prev;
+			const phases = prev.phases.map((phase, phaseIndex) => {
+				if (phaseIndex !== index) return phase;
+				return {
+					...phase,
+					...updates,
+				};
+			});
+
+			return {
+				...prev,
+				phases,
+			};
+		});
+
+		if (
+			!isPlaying &&
+			index === currentPhaseIndex &&
+			typeof updates.duration === "number"
+		) {
+			setTimeLeft(Math.max(1, updates.duration));
+		}
+	};
+
+	const addPhase = (mode: PhaseMode) => {
+		setSelectedExercise((prev) => {
+			if (!prev) return prev;
+			const newPhase: Phase = {
+				duration: 4,
+				mode,
+			};
+
+			return {
+				...prev,
+				phases: [...prev.phases, newPhase],
+			};
+		});
+	};
+
+	const removePhase = (index: number) => {
+		setSelectedExercise((prev) => {
+			if (!prev) return prev;
+
+			const updatedPhases = prev.phases.filter(
+				(_, phaseIndex) => phaseIndex !== index,
+			);
+
+			if (updatedPhases.length === 0) {
+				setIsPlaying(false);
+				setCurrentPhaseIndex(0);
+				setTimeLeft(0);
+				setCycleCount(0);
+			} else if (currentPhaseIndex >= updatedPhases.length) {
+				setCurrentPhaseIndex(0);
+				setTimeLeft(updatedPhases[0].duration);
+			}
+
+			return {
+				...prev,
+				phases: updatedPhases,
+			};
+		});
+	};
+
+	const resetCurrentExercise = () => {
+		if (!selectedExercise) return;
+		const originalExercise = exercises[selectedExercise.id.toString()];
+		if (!originalExercise) return;
+
+		const resetExercise = cloneExercise(originalExercise);
+		setIsPlaying(false);
+		setSelectedExercise(resetExercise);
+		setCurrentPhaseIndex(0);
+		setTimeLeft(resetExercise.phases[0]?.duration ?? 0);
 		setCycleCount(0);
 	};
 
@@ -91,13 +186,31 @@ export default function RespirationPage() {
 		setIsPlaying(false);
 		if (selectedExercise) {
 			setCurrentPhaseIndex(0);
-			setTimeLeft(selectedExercise.phases[0].duration);
+			setTimeLeft(selectedExercise.phases[0]?.duration ?? 0);
 		}
 		setCycleCount(0);
 	};
 
+	const handleTogglePlay = () => {
+		if (!selectedExercise || !canPlayExercise) return;
+
+		if (!isPlaying) {
+			const safeIndex =
+				currentPhaseIndex >= selectedExercise.phases.length
+					? 0
+					: currentPhaseIndex;
+			setCurrentPhaseIndex(safeIndex);
+			if (timeLeft <= 0 || safeIndex !== currentPhaseIndex) {
+				setTimeLeft(selectedExercise.phases[safeIndex].duration);
+			}
+		}
+
+		setIsPlaying((prev) => !prev);
+	};
+
 	useEffect(() => {
-		if (!isPlaying || !selectedExercise) return;
+		if (!isPlaying || !selectedExercise || selectedExercise.phases.length === 0)
+			return;
 		const timer = setTimeout(() => {
 			if (timeLeft > 1) {
 				setTimeLeft((prev) => prev - 1);
@@ -173,7 +286,7 @@ export default function RespirationPage() {
 				flexWrap="wrap"
 			>
 				{/* Liste des exercices */}
-				<Card className="p-8 gap-4 grow">
+				<Card className="p-8 gap-4 flex-1 min-w-0">
 					<Title size="sm" underline>
 						Exercices disponibles :
 					</Title>
@@ -185,13 +298,100 @@ export default function RespirationPage() {
 								onPress={() => selectExercise(ex)}
 								variant="light"
 							>
-								<span className="font-bold text-lg text-primary-700 mb-1">
+								<span className="font-bold text-lg text-primary-700 mb-1 w-full">
 									{ex.title}
 								</span>
-								<span className="text-sm text-gray-500">{ex.description}</span>
+								<span className="flex min-w-10 text-sm text-gray-500 w-full wrap-break-word">
+									{ex.description}
+								</span>
 							</Button>
 						))}
 					</Flex>
+					<Title size="sm" underline>
+						Phases personnalisables :
+					</Title>
+					{!selectedExercise ? (
+						<p className="text-gray-500 text-sm">
+							Sélectionnez un exercice pour éditer ses phases.
+						</p>
+					) : (
+						<Flex direction="column" gap="10px">
+							{selectedExercise.phases.length === 0 ? (
+								<p className="text-danger text-sm">
+									Ajoutez au moins une phase pour pouvoir lancer
+									l&apos;exercice.
+								</p>
+							) : (
+								selectedExercise.phases.map((phase, index) => (
+									<Card key={`${phase.mode}-${index}`} className="p-3 border">
+										<Flex direction="column" gap="8px" className="w-full">
+											<Flex
+												direction={isMobile ? "column" : "row"}
+												gap="8px"
+												fullWidth
+											>
+												<Select
+													label="Type"
+													selectedKeys={[phase.mode]}
+													onChange={(event) =>
+														updatePhase(index, {
+															mode: event.target.value as PhaseMode,
+														})
+													}
+													variant="bordered"
+													className="flex-1"
+												>
+													<SelectItem key="inspiration">Inspiration</SelectItem>
+													<SelectItem key="expiration">Expiration</SelectItem>
+													<SelectItem key="tenir">Tenir</SelectItem>
+												</Select>
+												<NumberInput
+													label="Durée (s)"
+													value={phase.duration}
+													onChange={(value) =>
+														updatePhase(index, {
+															duration: Math.max(1, Number(value) || 1),
+														})
+													}
+													min={1}
+													max={60}
+													className="flex-1"
+												/>
+											</Flex>
+											<Flex justifyContent="flex-end">
+												<Button
+													color="danger"
+													variant="light"
+													onPress={() => removePhase(index)}
+												>
+													Supprimer
+												</Button>
+											</Flex>
+										</Flex>
+									</Card>
+								))
+							)}
+
+							<Flex direction={isMobile ? "column" : "row"} gap="8px" fullWidth>
+								<Button variant="flat" onPress={() => addPhase("inspiration")}>
+									+ Inspiration
+								</Button>
+								<Button variant="flat" onPress={() => addPhase("expiration")}>
+									+ Expiration
+								</Button>
+								<Button variant="flat" onPress={() => addPhase("tenir")}>
+									+ Tenir
+								</Button>
+								<Button
+									color="warning"
+									variant="light"
+									onPress={resetCurrentExercise}
+								>
+									Réinitialiser
+								</Button>
+							</Flex>
+						</Flex>
+					)}
 					<Title size="sm" underline>
 						Options :
 					</Title>
@@ -204,7 +404,8 @@ export default function RespirationPage() {
 							max={100}
 						/>
 					</Flex>
-				</Card>{" "}
+				</Card>
+
 				{/* Zone visuelle et contrôles */}
 				{!selectedExercise ? (
 					<Flex
@@ -233,7 +434,7 @@ export default function RespirationPage() {
 						>
 							<Flex className="top-8 left-0 right-0" justifyContent="center">
 								<p className="text-primary-600 text-2xl font-extrabold">
-									{currentPhase?.name || ""}
+									{currentPhase ? phaseModeLabels[currentPhase.mode] : ""}
 								</p>
 							</Flex>
 
@@ -263,7 +464,8 @@ export default function RespirationPage() {
 									isIconOnly
 									className="w-16 h-16 rounded-full shadow-lg"
 									color={isPlaying ? "warning" : "primary"}
-									onPress={() => setIsPlaying(!isPlaying)}
+									onPress={handleTogglePlay}
+									isDisabled={!canPlayExercise}
 								>
 									{isPlaying ? <Pause /> : <PlayArrow />}
 								</Button>
