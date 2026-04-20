@@ -42,8 +42,6 @@ export async function createActu({
 			},
 		},
 	});
-
-	console.log("Nouvelle actu créée :", newActu);
 }
 
 export async function getAllActus(): Promise<IActu[]> {

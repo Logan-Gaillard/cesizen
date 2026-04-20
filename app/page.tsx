@@ -7,6 +7,7 @@ import Title from "./components/utils/Title";
 import { ArrowRight } from "@mui/icons-material";
 import { useRouter } from "next/navigation";
 import useInformations from "@/context/useInformations";
+import useIsMobile from "@/context/useIsMobile";
 
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination, Navigation, FreeMode } from "swiper/modules";
@@ -18,6 +19,7 @@ import "swiper/css/free-mode";
 export default function Home() {
 	const router = useRouter();
 	const { informations } = useInformations();
+	const isMobile = useIsMobile();
 
 	return (
 		<Flex
@@ -58,9 +60,9 @@ export default function Home() {
 					fullWidth
 				>
 					<Swiper
-						slidesPerView={3}
-						centeredSlides={true}
-						spaceBetween={0}
+						slidesPerView={isMobile ? 1 : 3}
+						centeredSlides={!isMobile}
+						spaceBetween={isMobile ? 16 : 0}
 						pagination={{
 							clickable: true,
 						}}
@@ -70,7 +72,7 @@ export default function Home() {
 						className="mySwiper w-full"
 					>
 						{Object.values(informations).map((info) => (
-							<SwiperSlide key={info.id} className="m-10">
+							<SwiperSlide key={info.id} className={isMobile ? "h-auto" : "m-10"}>
 								<InfoCard
 									title={info.title}
 									description={info.description}

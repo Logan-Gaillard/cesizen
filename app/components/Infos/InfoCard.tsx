@@ -25,10 +25,10 @@ const InfoCard = ({
 			isPressable
 			isHoverable
 			shadow="md"
-			className="p-3 w-full flex flex-col max-w-md"
+			className="p-3 w-full flex flex-col max-w-full sm:max-w-md mx-auto"
 			onPress={onPress}
 		>
-			<CardHeader className="p-2 pb-0 w-full flex-shrink-0">
+			<CardHeader className="p-2 pb-0 w-full">
 				<Image
 					alt={title}
 					className="w-full aspect-video object-cover"
