@@ -1,10 +1,12 @@
 "use server";
 
 import argon2 from "argon2";
+import { cookies } from "next/headers";
 
 import prisma from "@/libs/db";
-import { cookies } from "next/headers";
+import { RateLimitError } from "@/libs/rateLimit";
 import { getSessionUser } from "@/libs/user.service";
+import { checkRateLimit, resetRateLimit } from "@/libs/rateLimit";
 
 export type CreateUserData = {
 	nickname: string;
@@ -32,6 +34,20 @@ export type ChangeCurrentPasswordData = {
 };
 
 export async function registerUser(data: CreateUserData) {
+	// Check rate limit
+	try {
+		await checkRateLimit(data.email, "register");
+	} catch (error) {
+		if (error instanceof RateLimitError) {
+			return {
+				success: false,
+				message: `Trop de tentatives d'inscription. Veuillez réessayer dans ${error.retryAfterSeconds} secondes.`,
+				retryAfterSeconds: error.retryAfterSeconds,
+			};
+		}
+		throw error;
+	}
+
 	if (data.password !== data.confirmPassword) {
 		return {
 			success: false,
@@ -82,6 +98,20 @@ export async function loginUser(
 	password: string,
 	rememberMe: boolean,
 ) {
+	// Check rate limit
+	try {
+		await checkRateLimit(email, "login");
+	} catch (error) {
+		if (error instanceof RateLimitError) {
+			return {
+				success: false,
+				message: `Trop de tentatives de connexion. Veuillez réessayer dans ${error.retryAfterSeconds} secondes.`,
+				retryAfterSeconds: error.retryAfterSeconds,
+			};
+		}
+		throw error;
+	}
+
 	const user = await prisma.user.findUnique({ where: { email } });
 
 	if (!user)
@@ -110,6 +140,9 @@ export async function loginUser(
 		sameSite: "lax",
 		maxAge,
 	});
+
+	// Reset rate limit on successful login
+	await resetRateLimit(email, "login");
 
 	return { success: true };
 }
